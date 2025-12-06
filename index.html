@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>We Lookup — AEO (AI SEO) Experts — Demo</title>
+  <title>We Lookup — AEO (AI SEO) Experts</title>
 
-  <!-- Shared Styles -->
+  <!-- Shared stylesheet -->
   <link rel="stylesheet" href="/styles.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    /* Extra page-specific styles preserved from original homepage */
-
+    /* Home-specific background */
     body {
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(64,88,255,0.06), transparent),
-                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(64,88,255,0.06), transparent),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
     }
 
     .hero {
@@ -67,7 +67,7 @@
 
     .input-wrap {
       margin-top: 20px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      background: rgba(255,255,255,0.02);
       padding: 18px;
       border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.03);
@@ -97,6 +97,21 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
+    }
+
+    .tryme {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .tryme .example {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.04);
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
     }
 
     .features {
@@ -138,7 +153,7 @@
 <body>
   <div class="container">
 
-    <!-- Shared Header -->
+    <!-- Header -->
     <header>
       <div class="brand" onclick="location.href='/'" style="cursor:pointer">
         <div class="logo">WL</div>
@@ -172,19 +187,19 @@
           Paste your store's URL to start with an instant AI-powered audit.
         </p>
 
-        <div class="input-wrap" style="margin-top:18px;">
+        <div class="input-wrap">
           <input id="siteInput" placeholder="Enter your Shopify store URL (e.g., mystore.com)" spellcheck="false">
           <button class="btn" id="runBtn">🚀 Run Audit</button>
         </div>
 
-        <div class="tryme" aria-hidden="false" style="display:flex;gap:12px;margin-top:12px;">
-          <span style="color:var(--muted);align-self:center">Try me:</span>
+        <div class="tryme">
+          <span class="text-muted" style="align-self:center;">Try me:</span>
           <button class="example" data-val="madeincookware.com">madeincookware.com</button>
           <button class="example" data-val="gymshark.com">gymshark.com</button>
           <button class="example" data-val="aloyoga.com">aloyoga.com</button>
         </div>
 
-        <div class="features" style="margin-top:26px">
+        <div class="features">
           <div class="card">
             <div style="font-size:26px">🤖</div>
             <h3>Get Your Store AEO-ready</h3>
@@ -206,44 +221,46 @@
       </div>
     </main>
 
-    <!-- Shared Footer -->
+    <!-- Footer -->
     <footer>
-      <div><a class="email" href="mailto:support@welookup.info">support@welookup.info</a></div>
+      <div>
+        <a class="email" href="mailto:support@welookup.info">support@welookup.info</a>
+      </div>
       <div class="small-note">Free analysis • No store admin access needed</div>
       <div class="small-note">© 2025 WeLookup</div>
     </footer>
 
   </div>
 
-  <!-- Same JS as original -->
+  <!-- JS -->
   <script>
     const runBtn = document.getElementById('runBtn');
     const input = document.getElementById('siteInput');
     const examples = document.querySelectorAll('.example');
 
-    examples.forEach(btn => btn.addEventListener('click', ()=>{
+    examples.forEach(btn => btn.addEventListener('click', () => {
       input.value = btn.dataset.val;
       runAudit();
     }));
 
     runBtn.addEventListener('click', runAudit);
-    input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') runAudit(); });
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') runAudit(); });
 
-    function runAudit(){
+    function runAudit() {
       const url = input.value.trim();
-      if(!url){
+      if (!url) {
         flash('Please enter a store URL');
         return;
       }
       const normalized = normalizeUrl(url);
-      window.open(`https://${normalized}`,'_blank');
+      window.open(`https://${normalized}`, '_blank');
     }
 
-    function normalizeUrl(u){
+    function normalizeUrl(u) {
       return u.replace(/^https?:\/\//i,'').replace(/\/$/,'');
     }
 
-    function flash(msg){
+    function flash(msg) {
       const el = document.createElement('div');
       el.textContent = msg;
       el.style.position='fixed';
@@ -256,7 +273,7 @@
       el.style.color='white';
       el.style.zIndex=9999;
       document.body.appendChild(el);
-      setTimeout(()=>el.remove(),2200);
+      setTimeout(() => el.remove(), 2200);
     }
   </script>
 
