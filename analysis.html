@@ -64,28 +64,26 @@
     <div class="section">
       <h2>Platform Detection</h2>
       <div class="card">
-        <h3>Detected Platform: Shopify</h3>
-        <p>Confidence: 95%</p>
+        <h3 class="platform-name">Detected Platform: Shopify</h3>
+        <p class="platform-confidence">Confidence: 95%</p>
       </div>
 
       <h2>Installed Apps</h2>
       <div class="card">
         <h3>Apps Detected:</h3>
-        <ul>
-          <li>Shopify</li>
-          <li>Klaviyo</li>
-          <li>Google Analytics</li>
+        <ul class="apps-list">
+          <!-- Apps list will be dynamically populated -->
         </ul>
       </div>
 
       <h2>Performance Metrics</h2>
       <div class="card">
         <h3>Performance Metrics:</h3>
-        <p>Performance Score: 85</p>
-        <p>Requests: 43</p>
-        <p>Transfer Size: 1.2 MB</p>
-        <p>TTFB: 300 ms</p>
-        <p>FCP: 1200 ms</p>
+        <p class="performance-score">Performance Score: 85</p>
+        <p class="requests">Requests: 43</p>
+        <p class="transfer-size">Transfer Size: 1.2 MB</p>
+        <p class="ttfb">TTFB: 300 ms</p>
+        <p class="fcp">FCP: 1200 ms</p>
       </div>
     </div>
 
@@ -99,5 +97,36 @@
     </footer>
   </div>
 
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const storeUrl = urlParams.get('url');
+
+    if (storeUrl) {
+      performAnalysis(storeUrl);
+    }
+
+    function performAnalysis(url) {
+      // Simulating analysis results
+      const platform = "Shopify";
+      const apps = ["Klaviyo", "Google Analytics", "Shopify"];
+      const performance = {
+        score: 85,
+        requests: 43,
+        transferSize: "1.2 MB",
+        ttfb: "300 ms",
+        fcp: "1200 ms"
+      };
+
+      // Display results dynamically
+      document.querySelector('.platform-name').textContent = `Detected Platform: ${platform}`;
+      document.querySelector('.platform-confidence').textContent = `Confidence: 95%`;
+      document.querySelector('.apps-list').innerHTML = apps.map(app => `<li>${app}</li>`).join('');
+      document.querySelector('.performance-score').textContent = `Performance Score: ${performance.score}`;
+      document.querySelector('.requests').textContent = `Requests: ${performance.requests}`;
+      document.querySelector('.transfer-size').textContent = `Transfer Size: ${performance.transferSize}`;
+      document.querySelector('.ttfb').textContent = `TTFB: ${performance.ttfb}`;
+      document.querySelector('.fcp').textContent = `FCP: ${performance.fcp}`;
+    }
+  </script>
 </body>
 </html>
