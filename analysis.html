@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WeLookup — Store Analysis</title>
+
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    /* Specific styling for the analysis page */
+    .analysis-header {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .analysis-header h1 {
+      font-size: 36px;
+      margin: 10px 0;
+    }
+
+    .analysis-header .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.35);
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+    }
+
+    .section .card {
+      min-height: 180px;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand" onclick="location.href='/'" style="cursor:pointer">
+        <div class="logo">WL</div>
+        <div>
+          <div class="brand-title">WeLookup</div>
+          <div class="brand-sub">AEO (AI SEO) Experts</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+      </nav>
+    </header>
+
+    <!-- Analysis Header -->
+    <div class="analysis-header">
+      <h1>Store Analysis</h1>
+      <div class="status">
+        <span class="dot"></span>
+        <span>Analysis Complete</span>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="section">
+      <h2>Platform Detection</h2>
+      <div class="card">
+        <h3>Detected Platform: Shopify</h3>
+        <p>Confidence: 95%</p>
+      </div>
+
+      <h2>Installed Apps</h2>
+      <div class="card">
+        <h3>Apps Detected:</h3>
+        <ul>
+          <li>Shopify</li>
+          <li>Klaviyo</li>
+          <li>Google Analytics</li>
+        </ul>
+      </div>
+
+      <h2>Performance Metrics</h2>
+      <div class="card">
+        <h3>Performance Metrics:</h3>
+        <p>Performance Score: 85</p>
+        <p>Requests: 43</p>
+        <p>Transfer Size: 1.2 MB</p>
+        <p>TTFB: 300 ms</p>
+        <p>FCP: 1200 ms</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div>
+        <a class="email" href="mailto:support@welookup.info">support@welookup.info</a>
+      </div>
+      <div class="small-note">Free analysis • No store admin access needed</div>
+      <div class="small-note">© 2025 WeLookup</div>
+    </footer>
+  </div>
+
+</body>
+</html>
