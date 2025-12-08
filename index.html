@@ -252,7 +252,8 @@
         return;
       }
       const normalized = normalizeUrl(url);
-      // Redirects to analysis.html and passes the store URL
+
+      // Redirects to analysis.html and sends the URL as a parameter
       window.location.href = `analysis.html?url=${normalized}`;
     }
 
