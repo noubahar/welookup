@@ -252,7 +252,8 @@
         return;
       }
       const normalized = normalizeUrl(url);
-      window.open(`https://${normalized}`, '_blank');
+      // Redirects to analysis.html and passes the store URL
+      window.location.href = `analysis.html?url=${normalized}`;
     }
 
     function normalizeUrl(u) {
