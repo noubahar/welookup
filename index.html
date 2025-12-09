@@ -138,13 +138,44 @@
       margin: 0;
     }
 
-    @media (max-width: 900px) {
-      h1 { font-size: 42px; }
-      .features { grid-template-columns: 1fr; }
+    /* Popup Modal */
+    .popup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
     }
 
-    @media (max-width: 600px) {
-      .container { padding-bottom: 80px; }
+    .popup-content {
+      background: #2a2a2a;
+      padding: 30px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+      color: #fff;
+    }
+
+    .popup .btn {
+      background: #4CAF50;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .popup .close-btn {
+      background: #f44336;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
     }
   </style>
 </head>
@@ -242,8 +273,15 @@
       runAudit();
     }));
 
-    runBtn.addEventListener('click', runAudit);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') runAudit(); });
+    runBtn.addEventListener('click', openPopup);
+
+    function openPopup() {
+      document.getElementById('popup').style.display = 'flex';
+    }
+
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
+    }
 
     function runAudit() {
       const url = input.value.trim();
@@ -277,6 +315,24 @@
       setTimeout(() => el.remove(), 2200);
     }
   </script>
+
+  <!-- Popup Modal -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <h2>Unlock Instant Store Insights with WeLookup</h2>
+      <p>Get the <strong>WeLookup Chrome Extension</strong> for:</p>
+      <ul>
+        <li>✔️ Analyze any store in seconds</li>
+        <li>✔️ Detect platform, apps, and performance</li>
+        <li>✔️ No data collection — runs 100% locally</li>
+      </ul>
+      <a href="https://chromewebstore.google.com/detail/welookup/beocpennmliolhmgdiiacnkdpdpbcpmk" target="_blank">
+        <button class="btn">Download the Extension</button>
+      </a>
+      <br><br>
+      <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+  </div>
 
 </body>
 </html>
