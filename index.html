@@ -274,6 +274,7 @@
     }));
 
     runBtn.addEventListener('click', openPopup);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') openPopup(); });
 
     function openPopup() {
       document.getElementById('popup').style.display = 'flex';
@@ -281,38 +282,6 @@
 
     function closePopup() {
       document.getElementById('popup').style.display = 'none';
-    }
-
-    function runAudit() {
-      const url = input.value.trim();
-      if (!url) {
-        flash('Please enter a store URL');
-        return;
-      }
-      const normalized = normalizeUrl(url);
-
-      // Redirects to analysis.html and sends the URL as a parameter
-      window.location.href = `analysis.html?url=${normalized}`;
-    }
-
-    function normalizeUrl(u) {
-      return u.replace(/^https?:\/\//i,'').replace(/\/$/,'');
-    }
-
-    function flash(msg) {
-      const el = document.createElement('div');
-      el.textContent = msg;
-      el.style.position='fixed';
-      el.style.left='50%';
-      el.style.top='24px';
-      el.style.transform='translateX(-50%)';
-      el.style.background='rgba(0,0,0,0.6)';
-      el.style.padding='10px 16px';
-      el.style.borderRadius='10px';
-      el.style.color='white';
-      el.style.zIndex=9999;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 2200);
     }
   </script>
 
