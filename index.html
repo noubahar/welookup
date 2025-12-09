@@ -10,134 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
-    /* Home-specific background */
-    body {
-      background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(64,88,255,0.06), transparent),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 22px;
-      padding: 48px 16px;
-      justify-items: center;
-      text-align: center;
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(0,0,0,0.35);
-      padding: 8px 14px;
-      border-radius: 999px;
-      color: var(--muted);
-    }
-
-    .status .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #2ecc71;
-      box-shadow: 0 0 6px rgba(46,204,113,0.16);
-    }
-
-    h1 {
-      font-size: 56px;
-      line-height: 1.02;
-      margin: 10px 0;
-      font-weight: 800;
-    }
-
-    h1 .accent {
-      display: block;
-      color: var(--accent);
-      font-weight: 800;
-    }
-
-    p.lead {
-      color: var(--muted);
-      font-size: 18px;
-      max-width: 880px;
-      margin: 0 auto;
-    }
-
-    .input-wrap {
-      margin-top: 20px;
-      background: rgba(255,255,255,0.02);
-      padding: 18px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.03);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .input-wrap input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #cfe6ff;
-      font-size: 16px;
-      padding: 10px;
-    }
-
-    .input-wrap .btn {
-      background: var(--accent);
-      border: none;
-      padding: 10px 18px;
-      border-radius: 12px;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tryme {
-      display: flex;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .tryme .example {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.04);
-      padding: 10px 12px;
-      border-radius: 8px;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3,1fr);
-      gap: 18px;
-      margin-top: 36px;
-    }
-
-    .card {
-      background: rgba(255,255,255,0.02);
-      border-radius: 14px;
-      padding: 22px;
-      border: 1px solid rgba(255,255,255,0.03);
-      min-height: 140px;
-    }
-
-    .card h3 {
-      margin: 8px 0;
-      font-size: 18px;
-    }
-
-    .card p {
-      color: var(--muted);
-      margin: 0;
-    }
-
     /* Popup Modal */
     .popup {
       display: none;
@@ -180,7 +52,7 @@
     }
 
     .popup .btn {
-      background: var(--accent);
+      background: var(--accent);  /* Accent color from design system */
       border: none;
       padding: 12px 20px;
       border-radius: var(--radius);
@@ -214,22 +86,6 @@
 
 <body>
   <div class="container">
-
-    <!-- Header -->
-    <header>
-      <div class="brand" onclick="location.href='/'" style="cursor:pointer">
-        <div class="logo">WL</div>
-        <div>
-          <div class="brand-title">WeLookup</div>
-          <div class="brand-sub">AEO (AI SEO) Experts</div>
-        </div>
-      </div>
-
-      <nav class="nav">
-        <a href="#">Articles</a>
-        <a href="/privacy-policy.html">Privacy Policy</a>
-      </nav>
-    </header>
 
     <!-- Hero Section -->
     <main class="hero">
@@ -270,6 +126,5 @@
       </a>
     </div>
   </div>
-
 </body>
 </html>
