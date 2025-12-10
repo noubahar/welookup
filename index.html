@@ -11,201 +11,39 @@
     <style>
         /* Home-specific background */
         body {
-            background: radial-gradient(1200px 600px at 10% 10%, rgba(64, 88, 255, 0.06), transparent),
-                linear-gradient(180deg, var(--bg1), var(--bg2));
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         .hero {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 22px;
-            padding: 48px 16px;
-            justify-items: center;
+            place-items: center;
+            height: 100vh;
             text-align: center;
-        }
-
-        .status {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.35);
-            padding: 8px 14px;
-            border-radius: 999px;
-            color: var(--muted);
-        }
-
-        .status .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #2ecc71;
-            box-shadow: 0 0 6px rgba(46, 204, 113, 0.16);
         }
 
         h1 {
             font-size: 56px;
-            line-height: 1.02;
-            margin: 10px 0;
-            font-weight: 800;
-        }
-
-        h1 .accent {
-            display: block;
-            color: var(--accent);
-            font-weight: 800;
-        }
-
-        p.lead {
-            color: var(--muted);
-            font-size: 18px;
-            max-width: 880px;
-            margin: 0 auto;
-        }
-
-        .input-wrap {
-            margin-top: 20px;
-            background: rgba(255, 255, 255, 0.02);
-            padding: 18px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .input-wrap input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: #cfe6ff;
-            font-size: 16px;
-            padding: 10px;
-        }
-
-        .input-wrap .btn {
-            background: var(--accent);
-            border: none;
-            padding: 10px 18px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tryme {
-            display: flex;
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .tryme .example {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            padding: 10px 12px;
-            border-radius: 8px;
-            color: var(--muted);
-            cursor: pointer;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-top: 36px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 14px;
-            padding: 22px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            min-height: 140px;
-        }
-
-        .card h3 {
-            margin: 8px 0;
-            font-size: 18px;
-        }
-
-        .card p {
-            color: var(--muted);
-            margin: 0;
-        }
-
-        /* Popup Modal */
-        .popup {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .popup-content {
-            background: var(--card);
-            padding: 30px;
-            border-radius: var(--radius);
-            width: 350px;
-            text-align: center;
-            color: var(--text);
-            position: relative;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-        }
-
-        .popup h2 {
-            font-size: 24px;
-            color: var(--text);
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        .popup ul {
-            list-style-type: none;
-            padding-left: 0;
-            color: var(--muted);
-            font-size: 16px;
             margin-bottom: 20px;
         }
 
-        .popup ul li {
-            margin-bottom: 8px;
-        }
-
-        .popup .btn {
-            background: var(--accent);
-            border: none;
-            padding: 12px 20px;
-            border-radius: var(--radius);
+        .btn {
+            padding: 10px 20px;
+            background-color: #7c5bff;
             color: white;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.2s;
-        }
-
-        .popup .btn:hover {
-            background: #7c5bff;
-        }
-
-        .popup .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            color: var(--muted);
-            background: transparent;
             border: none;
+            border-radius: 12px;
+            font-size: 16px;
             cursor: pointer;
         }
 
-        .popup .close-btn:hover {
-            color: #ffffff;
+        nav a {
+            color: #ccc;
+            text-decoration: none;
+            margin: 0 10px;
         }
     </style>
 </head>
@@ -234,36 +72,12 @@
         </main>
     </div>
 
-    <!-- JS -->
     <script>
         const runBtn = document.getElementById('runBtn');
-        runBtn.addEventListener('click', openPopup);
-
-        function openPopup() {
-            document.getElementById('popup').style.display = 'flex';
-        }
-
-        function closePopup() {
-            document.getElementById('popup').style.display = 'none';
-        }
+        runBtn.addEventListener('click', () => {
+            alert("Audit started!");
+        });
     </script>
-
-    <!-- Popup Modal -->
-    <div id="popup" class="popup">
-        <div class="popup-content">
-            <span class="close-btn" onclick="closePopup()">×</span>
-            <h2>Unlock Instant Store Insights with WeLookup</h2>
-            <p>Get the <strong>WeLookup Chrome Extension</strong> for:</p>
-            <ul>
-                <li>✔️ Analyze any store in seconds</li>
-                <li>✔️ Detect platform, apps, and performance</li>
-                <li>✔️ No data collection — runs 100% locally</li>
-            </ul>
-            <a href="https://chromewebstore.google.com/detail/welookup/beocpennmliolhmgdiiacnkdpdpbcpmk" target="_blank">
-                <button class="btn">Download the Extension</button>
-            </a>
-        </div>
-    </div>
 </body>
 
 </html>
