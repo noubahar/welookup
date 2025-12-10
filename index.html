@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WeLookup — AEO (AI SEO) Experts</title>
 
+  <!-- Link to favicon.ico -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+
   <link rel="stylesheet" href="/styles.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     /* Home-specific background */
@@ -15,7 +18,6 @@
       background:
         radial-gradient(1200px 600px at 10% 10%, rgba(64,88,255,0.06), transparent),
         linear-gradient(180deg, var(--bg1), var(--bg2));
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
     }
 
     .hero {
@@ -232,7 +234,6 @@
   <script>
     const runBtn = document.getElementById('runBtn');
     
-    // Preventing redirect and opening the popup instead
     runBtn.addEventListener('click', openPopup);
 
     function openPopup() {
