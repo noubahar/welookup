@@ -138,13 +138,77 @@
       margin: 0;
     }
 
-    @media (max-width: 900px) {
-      h1 { font-size: 42px; }
-      .features { grid-template-columns: 1fr; }
+    /* Popup Modal */
+    .popup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8); /* dark overlay */
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
     }
 
-    @media (max-width: 600px) {
-      .container { padding-bottom: 80px; }
+    .popup-content {
+      background: var(--card); /* Using card color from design system */
+      padding: 30px;
+      border-radius: var(--radius); /* Matching with design system radius */
+      width: 450px; /* Increased width for better display */
+      text-align: center;
+      color: var(--text);
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25); /* Soft shadow */
+    }
+
+    .popup h2 {
+      font-size: 24px;
+      color: var(--text);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .popup ul {
+      list-style-type: none;
+      padding-left: 0;
+      color: var(--muted);
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .popup ul li {
+      margin-bottom: 8px;
+    }
+
+    .popup .btn {
+      background: var(--accent); /* Adjusted color for the button */
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+
+    .popup .btn:hover {
+      background: #7c5bff; /* Lighter shade of accent */
+    }
+
+    /* New close button style */
+    .popup .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.6); /* Light transparent color */
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    .popup .close-btn:hover {
+      color: #ffffff;
     }
   </style>
 </head>
@@ -168,113 +232,45 @@
       </nav>
     </header>
 
-    <!-- Hero -->
+    <!-- Hero Section -->
     <main class="hero">
-      <div>
-        <div class="status">
-          <span class="dot"></span>
-          <span>AI Assistant Online</span>
-        </div>
-
-        <h1>
-          AEO (AI SEO) Experts
-          <span class="accent">Specializing in Shopify Stores</span>
-        </h1>
-
-        <p class="lead">
-          Get ahead of the wave of shoppers going to ChatGPT or Perplexity for their purchase decisions.
-          Paste your store's URL to start with an instant AI-powered audit.
-        </p>
-
-        <div class="input-wrap">
-          <input id="siteInput" placeholder="Enter your Shopify store URL (e.g., mystore.com)" spellcheck="false">
-          <button class="btn" id="runBtn">🚀 Run Audit</button>
-        </div>
-
-        <div class="tryme">
-          <span class="text-muted" style="align-self:center;">Try me:</span>
-          <button class="example" data-val="madeincookware.com">madeincookware.com</button>
-          <button class="example" data-val="gymshark.com">gymshark.com</button>
-          <button class="example" data-val="aloyoga.com">aloyoga.com</button>
-        </div>
-
-        <div class="features">
-          <div class="card">
-            <div style="font-size:26px">🤖</div>
-            <h3>Get Your Store AEO-ready</h3>
-            <p>Appear in LLM searches — practical recommendations to be found by AI assistants.</p>
-          </div>
-
-          <div class="card">
-            <div style="font-size:26px">⚡</div>
-            <h3>Site Frontend Audit</h3>
-            <p>AI-powered frontend AEO recommendations focusing on content, metadata and structure.</p>
-          </div>
-
-          <div class="card">
-            <div style="font-size:26px">🎯</div>
-            <h3>Speed Promise</h3>
-            <p>Report generated in under 30 seconds with actionable insights.</p>
-          </div>
-        </div>
-      </div>
+      <h1>WeLookup</h1>
+      <button id="runBtn" class="btn">🚀 Run Audit</button>
     </main>
-
-    <!-- Footer -->
-    <footer>
-      <div>
-        <a class="email" href="mailto:support@welookup.info">support@welookup.info</a>
-      </div>
-      <div class="small-note">Free analysis • No store admin access needed</div>
-      <div class="small-note">© 2025 WeLookup</div>
-    </footer>
 
   </div>
 
   <!-- JS -->
   <script>
     const runBtn = document.getElementById('runBtn');
-    const input = document.getElementById('siteInput');
-    const examples = document.querySelectorAll('.example');
+    
+    runBtn.addEventListener('click', openPopup);
 
-    examples.forEach(btn => btn.addEventListener('click', () => {
-      input.value = btn.dataset.val;
-      runAudit();
-    }));
-
-    runBtn.addEventListener('click', runAudit);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') runAudit(); });
-
-    function runAudit() {
-      const url = input.value.trim();
-      if (!url) {
-        flash('Please enter a store URL');
-        return;
-      }
-      const normalized = normalizeUrl(url);
-      window.open(`https://${normalized}`, '_blank');
+    function openPopup() {
+      document.getElementById('popup').style.display = 'flex';
     }
 
-    function normalizeUrl(u) {
-      return u.replace(/^https?:\/\//i,'').replace(/\/$/,'');
-    }
-
-    function flash(msg) {
-      const el = document.createElement('div');
-      el.textContent = msg;
-      el.style.position='fixed';
-      el.style.left='50%';
-      el.style.top='24px';
-      el.style.transform='translateX(-50%)';
-      el.style.background='rgba(0,0,0,0.6)';
-      el.style.padding='10px 16px';
-      el.style.borderRadius='10px';
-      el.style.color='white';
-      el.style.zIndex=9999;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 2200);
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
     }
   </script>
+
+  <!-- Popup Modal -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <span class="close-btn" onclick="closePopup()">×</span>
+      <h2>Unlock Instant Store Insights with WeLookup</h2>
+      <p>Get the <strong>WeLookup Chrome Extension</strong> for:</p>
+      <ul>
+        <li>✔️ Analyze any store in seconds</li>
+        <li>✔️ Detect platform, apps, and performance</li>
+        <li>✔️ No data collection — runs 100% locally</li>
+      </ul>
+      <a href="https://chromewebstore.google.com/detail/welookup/beocpennmliolhmgdiiacnkdpdpbcpmk" target="_blank">
+        <button class="btn">Download the Extension</button>
+      </a>
+    </div>
+  </div>
 
 </body>
 </html>
