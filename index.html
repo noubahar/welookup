@@ -15,7 +15,6 @@
       background:
         radial-gradient(1200px 600px at 10% 10%, rgba(64,88,255,0.06), transparent),
         linear-gradient(180deg, var(--bg1), var(--bg2));
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
     }
 
     .hero {
@@ -49,6 +48,12 @@
       font-size: 56px;
       line-height: 1.02;
       margin: 10px 0;
+      font-weight: 800;
+    }
+
+    h1 .accent {
+      display: block;
+      color: var(--accent);
       font-weight: 800;
     }
 
@@ -123,80 +128,54 @@
       min-height: 140px;
     }
 
+    .card h3 {
+      margin: 8px 0;
+      font-size: 18px;
+    }
+
+    .card p {
+      color: var(--muted);
+      margin: 0;
+    }
+
     /* Popup Modal */
     .popup {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.8); /* dark overlay */
+      background: rgba(0,0,0,0.7);
       justify-content: center;
       align-items: center;
       z-index: 9999;
     }
 
     .popup-content {
-      background: var(--card); /* Using card color from design system */
+      background: #2a2a2a;
       padding: 30px;
-      border-radius: var(--radius); /* Matching with design system radius */
-      width: 400px; /* Increased width for better readability */
+      border-radius: 10px;
+      width: 300px;
       text-align: center;
-      color: var(--text);
-      position: relative;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25); /* Soft shadow */
-    }
-
-    .popup h2 {
-      font-size: 24px;
-      color: var(--text);
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-
-    .popup ul {
-      list-style-type: none;
-      padding-left: 0;
-      color: var(--muted);
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
-
-    .popup ul li {
-      margin-bottom: 8px;
+      color: #fff;
     }
 
     .popup .btn {
-      background: var(--accent);
+      background: #4CAF50;
       border: none;
-      padding: 12px 20px;
-      border-radius: var(--radius);
+      padding: 10px 18px;
+      border-radius: 12px;
       color: white;
       font-weight: 600;
       cursor: pointer;
-      font-size: 16px;
-      transition: background 0.2s;
-    }
-
-    .popup .btn:hover {
-      background: #7c5bff; /* Lighter shade of accent */
     }
 
     .popup .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 18px; /* Smaller size for close button */
-      color: var(--muted);
-      background: transparent;
+      background: #f44336;
       border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: white;
       cursor: pointer;
-    }
-
-    .popup .close-btn:hover {
-      color: #ffffff;
-    }
-
-    .popup h2 span {
-      color: #4058ff; /* Brand color for "WeLookup" */
+      font-size: 16px;
     }
   </style>
 </head>
@@ -220,20 +199,82 @@
       </nav>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Hero -->
     <main class="hero">
-      <h1>WeLookup</h1>
-      <button id="runBtn" class="btn">🚀 Run Audit</button>
+      <div>
+        <div class="status">
+          <span class="dot"></span>
+          <span>AI Assistant Online</span>
+        </div>
+
+        <h1>
+          AEO (AI SEO) Experts
+          <span class="accent">Specializing in Shopify Stores</span>
+        </h1>
+
+        <p class="lead">
+          Get ahead of the wave of shoppers going to ChatGPT or Perplexity for their purchase decisions.
+          Paste your store's URL to start with an instant AI-powered audit.
+        </p>
+
+        <div class="input-wrap">
+          <input id="siteInput" placeholder="Enter your Shopify store URL (e.g., mystore.com)" spellcheck="false">
+          <button class="btn" id="runBtn">🚀 Run Audit</button>
+        </div>
+
+        <div class="tryme">
+          <span class="text-muted" style="align-self:center;">Try me:</span>
+          <button class="example" data-val="madeincookware.com">madeincookware.com</button>
+          <button class="example" data-val="gymshark.com">gymshark.com</button>
+          <button class="example" data-val="aloyoga.com">aloyoga.com</button>
+        </div>
+
+        <div class="features">
+          <div class="card">
+            <div style="font-size:26px">🤖</div>
+            <h3>Get Your Store AEO-ready</h3>
+            <p>Appear in LLM searches — practical recommendations to be found by AI assistants.</p>
+          </div>
+
+          <div class="card">
+            <div style="font-size:26px">⚡</div>
+            <h3>Site Frontend Audit</h3>
+            <p>AI-powered frontend AEO recommendations focusing on content, metadata and structure.</p>
+          </div>
+
+          <div class="card">
+            <div style="font-size:26px">🎯</div>
+            <h3>Speed Promise</h3>
+            <p>Report generated in under 30 seconds with actionable insights.</p>
+          </div>
+        </div>
+      </div>
     </main>
+
+    <!-- Footer -->
+    <footer>
+      <div>
+        <a class="email" href="mailto:support@welookup.info">support@welookup.info</a>
+      </div>
+      <div class="small-note">Free analysis • No store admin access needed</div>
+      <div class="small-note">© 2025 WeLookup</div>
+    </footer>
 
   </div>
 
   <!-- JS -->
   <script>
     const runBtn = document.getElementById('runBtn');
-    
-    // Preventing redirect and opening the popup instead
+    const input = document.getElementById('siteInput');
+    const examples = document.querySelectorAll('.example');
+
+    examples.forEach(btn => btn.addEventListener('click', () => {
+      input.value = btn.dataset.val;
+      runAudit();
+    }));
+
     runBtn.addEventListener('click', openPopup);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') openPopup(); });
 
     function openPopup() {
       document.getElementById('popup').style.display = 'flex';
@@ -247,8 +288,7 @@
   <!-- Popup Modal -->
   <div id="popup" class="popup">
     <div class="popup-content">
-      <span class="close-btn" onclick="closePopup()">×</span>
-      <h2>Unlock Instant Store Insights with <span>WeLookup</span></h2>
+      <h2>Unlock Instant Store Insights with WeLookup</h2>
       <p>Get the <strong>WeLookup Chrome Extension</strong> for:</p>
       <ul>
         <li>✔️ Analyze any store in seconds</li>
@@ -258,6 +298,8 @@
       <a href="https://chromewebstore.google.com/detail/welookup/beocpennmliolhmgdiiacnkdpdpbcpmk" target="_blank">
         <button class="btn">Download the Extension</button>
       </a>
+      <br><br>
+      <button class="close-btn" onclick="closePopup()">Close</button>
     </div>
   </div>
 
