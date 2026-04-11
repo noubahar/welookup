@@ -23,7 +23,7 @@
 
     .search-top {
       text-align: center;
-      margin-top: 30px;
+      margin-top: 40px;
       margin-bottom: 30px;
     }
 
@@ -39,17 +39,6 @@
       font-size: 18px;
       margin: 0 auto;
       max-width: 680px;
-    }
-
-    .back-link {
-      display: inline-block;
-      margin-top: 8px;
-      color: var(--muted);
-      text-decoration: none;
-    }
-
-    .back-link:hover {
-      color: var(--text);
     }
 
     .search-box {
@@ -129,6 +118,7 @@
 <body>
   <div class="container">
 
+    <!-- Header -->
     <header>
       <div class="brand"
            onclick="location.href='/'"
@@ -153,9 +143,9 @@
       </nav>
     </header>
 
+    <!-- Main -->
     <main class="search-page">
       <div class="search-top">
-        <a class="back-link" href="/">← Back to Home</a>
         <h1>Search Store Data</h1>
         <p>
           Enter a Shopify store domain to look up the related store information.
@@ -183,5 +173,8 @@
     </main>
 
   </div>
+
+  <!-- JS -->
+  <script src="script.js"></script>
 </body>
 </html>
