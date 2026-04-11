@@ -18,3 +18,43 @@ fetch("data.csv")
 
     console.log("CSV loaded:", rawData.length);
   });
+// normalize domain
+function normalize(input) {
+  try {
+    input = input.toLowerCase().trim();
+
+    if (!input.startsWith("http")) {
+      input = "https://" + input;
+    }
+
+    const url = new URL(input);
+    let host = url.hostname;
+
+    if (host.startsWith("www.")) {
+      host = host.replace("www.", "");
+    }
+
+    return host;
+  } catch {
+    return input.toLowerCase().trim();
+  }
+}
+
+// search logic
+document.getElementById("searchBtn").addEventListener("click", () => {
+  const input = document.getElementById("searchInput").value;
+  const query = normalize(input);
+
+  const result = rawData.find(row => {
+    return [
+      row["Domain 1"],
+      row["Domain 2"],
+      row["Domain 3"],
+      row["Domain 4"],
+      row["Domain 5"],
+      row["Domain 6"]
+    ].some(d => normalize(d) === query);
+  });
+
+  console.log("Result:", result);
+});
