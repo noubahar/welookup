@@ -1,22 +1,67 @@
 let rawData = [];
 
+// Robust CSV parser
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        cell += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === "," && !inQuotes) {
+      row.push(cell);
+      cell = "";
+    } else if ((char === "\n" || char === "\r") && !inQuotes) {
+      if (char === "\r" && nextChar === "\n") i++;
+      row.push(cell);
+      if (row.some((value) => value.trim() !== "")) {
+        rows.push(row);
+      }
+      row = [];
+      cell = "";
+    } else {
+      cell += char;
+    }
+  }
+
+  if (cell.length > 0 || row.length > 0) {
+    row.push(cell);
+    if (row.some((value) => value.trim() !== "")) {
+      rows.push(row);
+    }
+  }
+
+  return rows;
+}
+
 // Load CSV
 fetch("data.csv")
   .then((res) => res.text())
   .then((text) => {
-    const rows = text
-      .split("\n")
-      .map((row) => row.trim())
-      .filter((row) => row);
+    const rows = parseCSV(text);
 
-    const headers = rows[0].split(",").map((h) => h.trim());
+    if (!rows.length) {
+      console.error("CSV is empty");
+      return;
+    }
 
-    rawData = rows.slice(1).map((row) => {
-      const values = row.split(",");
+    const headers = rows[0].map((h) => h.trim());
+
+    rawData = rows.slice(1).map((values) => {
       const obj = {};
 
       headers.forEach((header, index) => {
-        obj[header] = values[index]?.trim() || "";
+        obj[header] = (values[index] || "").trim();
       });
 
       return obj;
