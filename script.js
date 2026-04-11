@@ -58,7 +58,31 @@ function normalize(input) {
   }
 }
 
-// Find matching row
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function safeLink(url) {
+  if (!url) return "";
+  const trimmed = url.trim();
+  if (!trimmed) return "";
+
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("mailto:")
+  ) {
+    return trimmed;
+  }
+
+  return "https://" + trimmed;
+}
+
 function findMatch(query) {
   return rawData.find((row) => {
     const domains = [
@@ -74,7 +98,44 @@ function findMatch(query) {
   });
 }
 
-// Render result
+function renderField(label, value, type = "text") {
+  if (!value || !value.trim()) return "";
+
+  let content = escapeHtml(value);
+
+  if (type === "link") {
+    const href = safeLink(value);
+    content = `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(value)}</a>`;
+  }
+
+  if (type === "email") {
+    const href = "mailto:" + value.trim();
+    content = `<a href="${escapeHtml(href)}">${escapeHtml(value)}</a>`;
+  }
+
+  return `
+    <div style="margin-bottom:14px;">
+      <div style="font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:4px;">
+        ${escapeHtml(label)}
+      </div>
+      <div style="color:var(--text); line-height:1.6; word-break:break-word;">
+        ${content}
+      </div>
+    </div>
+  `;
+}
+
+function renderSection(title, fieldsHtml) {
+  if (!fieldsHtml.trim()) return "";
+
+  return `
+    <div class="section">
+      <h2 style="margin-top:0;">${escapeHtml(title)}</h2>
+      ${fieldsHtml}
+    </div>
+  `;
+}
+
 function renderResult(query, row) {
   const resultsDiv = document.getElementById("results");
 
@@ -83,103 +144,46 @@ function renderResult(query, row) {
     return;
   }
 
-  const storeDetails = [
-    ["Created At", row["created_at"]],
-    ["Currency Code", row["currency_code"]],
-    ["Language Code", row["language_code"]]
-  ];
-
-  const pages = [
-    ["Contact Page", row["contact_page"]],
-    ["Financing Page", row["financing_page"]],
-    ["FAQ Page", row["faq_page"]],
-    ["About Us", row["about_us"]]
-  ];
-
-  const social = [
-    ["Facebook", row["Facebook"]],
-    ["Instagram", row["Instagram"]],
-    ["Email", row["Email"]]
-  ];
-
-  function renderItems(items, isLink = false, isEmail = false) {
-    return items
-      .filter(([, value]) => value && value.trim() !== "")
-      .map(([label, value]) => {
-        let content = value;
-
-        if (isEmail) {
-          content = `<a href="mailto:${value}" style="color: var(--accent); text-decoration: none;">${value}</a>`;
-        } else if (isLink) {
-          content = `<a href="${value}" target="_blank" rel="noopener noreferrer" style="color: var(--accent); text-decoration: none;">${value}</a>`;
-        }
-
-        return `
-          <div style="margin-bottom:10px;">
-            <strong>${label}:</strong> ${content}
-          </div>
-        `;
-      })
-      .join("");
-  }
-
-  const locationHtml = `
-    ${row["location"] ? `<div style="margin-bottom:10px;"><strong>Location:</strong> ${row["location"]}</div>` : ""}
-    ${row["country_code"] ? `<div style="margin-bottom:10px;"><strong>Country Code:</strong> ${row["country_code"]}</div>` : ""}
+  const matchedSection = `
+    <div class="section">
+      <div style="font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-bottom:8px;">
+        Matched Domain
+      </div>
+      <div style="font-size:22px; font-weight:700; color:var(--text); word-break:break-word;">
+        ${escapeHtml(query)}
+      </div>
+    </div>
   `;
 
-  const storeDetailsHtml = renderItems(storeDetails);
-  const pagesHtml = renderItems(pages, true, false);
-  const socialHtml = `
-    ${renderItems(social.filter(([label]) => label !== "Email"), true, false)}
-    ${renderItems(social.filter(([label]) => label === "Email"), false, true)}
-  `;
+  const locationHtml =
+    renderField("Location", row["location"]) +
+    renderField("Country Code", row["country_code"]);
+
+  const storeDetailsHtml =
+    renderField("Created At", row["created_at"]) +
+    renderField("Currency Code", row["currency_code"]) +
+    renderField("Language Code", row["language_code"]);
+
+  const pagesHtml =
+    renderField("Contact Page", row["contact_page"], "link") +
+    renderField("Financing Page", row["financing_page"], "link") +
+    renderField("FAQ Page", row["faq_page"], "link") +
+    renderField("About Us", row["about_us"], "link");
+
+  const socialHtml =
+    renderField("Facebook", row["Facebook"], "link") +
+    renderField("Instagram", row["Instagram"], "link") +
+    renderField("Email", row["Email"], "email");
 
   resultsDiv.innerHTML = `
-    <div style="
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 18px;
-      padding: 24px;
-      margin-top: 24px;
-    ">
-      <div style="margin-bottom: 26px;">
-        <h2 style="margin:0 0 10px 0;">Matched Domain</h2>
-        <div style="color: var(--muted);">${query}</div>
-      </div>
-
-      ${locationHtml ? `
-        <div style="margin-bottom: 24px;">
-          <h3 style="margin:0 0 12px 0;">Location</h3>
-          ${locationHtml}
-        </div>
-      ` : ""}
-
-      ${storeDetailsHtml ? `
-        <div style="margin-bottom: 24px;">
-          <h3 style="margin:0 0 12px 0;">Store Details</h3>
-          ${storeDetailsHtml}
-        </div>
-      ` : ""}
-
-      ${pagesHtml ? `
-        <div style="margin-bottom: 24px;">
-          <h3 style="margin:0 0 12px 0;">Pages</h3>
-          ${pagesHtml}
-        </div>
-      ` : ""}
-
-      ${socialHtml ? `
-        <div>
-          <h3 style="margin:0 0 12px 0;">Social & Contact</h3>
-          ${socialHtml}
-        </div>
-      ` : ""}
-    </div>
+    ${matchedSection}
+    ${renderSection("Location", locationHtml)}
+    ${renderSection("Store Details", storeDetailsHtml)}
+    ${renderSection("Pages", pagesHtml)}
+    ${renderSection("Social & Contact", socialHtml)}
   `;
 }
 
-// Run search
 function runSearch() {
   const input = document.getElementById("searchInput").value;
   const query = normalize(input);
@@ -193,7 +197,6 @@ function runSearch() {
   renderResult(query, result);
 }
 
-// Events
 document.getElementById("searchBtn").addEventListener("click", runSearch);
 
 document.getElementById("searchInput").addEventListener("keydown", (event) => {
