@@ -5,17 +5,181 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Search — WeLookup</title>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(64,88,255,0.06), transparent),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    .search-page {
+      padding: 40px 16px 60px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .search-top {
+      text-align: center;
+      margin-top: 30px;
+      margin-bottom: 30px;
+    }
+
+    .search-top h1 {
+      font-size: 48px;
+      line-height: 1.05;
+      margin: 0 0 14px;
+      font-weight: 800;
+    }
+
+    .search-top p {
+      color: var(--muted);
+      font-size: 18px;
+      margin: 0 auto;
+      max-width: 680px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 8px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+    }
+
+    .search-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px;
+      padding: 22px;
+      margin-top: 28px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 260px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--muted);
+    }
+
+    .search-btn {
+      background-color: rgb(64, 88, 255);
+      color: white;
+      border-radius: 14px;
+      padding: 16px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .search-btn:hover {
+      background-color: rgb(50, 70, 200);
+    }
+
+    .search-note {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    #results {
+      margin-top: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .search-top h1 {
+        font-size: 38px;
+      }
+
+      .search-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 
 <body>
   <div class="container">
-    
+
     <header>
-      <a href="/">← Back to Home</a>
+      <div class="brand"
+           onclick="location.href='/'"
+           style="cursor:pointer; display:flex; align-items:center; gap:12px;">
+
+        <img
+          src="welookuplogo.png"
+          alt="WeLookup Logo"
+          style="width:32px; height:auto;"
+        />
+
+        <div>
+          <div class="brand-title">WeLookup</div>
+          <div class="brand-sub">Instant Store Analysis</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="/search.html">Search</a>
+        <a href="https://welookup.substack.com/">Articles</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+      </nav>
     </header>
 
-    <main style="margin-top:40px;">
-      <h1>Search</h1>
+    <main class="search-page">
+      <div class="search-top">
+        <a class="back-link" href="/">← Back to Home</a>
+        <h1>Search Store Data</h1>
+        <p>
+          Enter a Shopify store domain to look up the related store information.
+        </p>
+      </div>
+
+      <div class="search-box">
+        <div class="search-row">
+          <input
+            id="searchInput"
+            class="search-input"
+            type="text"
+            placeholder="Enter store domain"
+            autocomplete="off"
+          />
+          <button id="searchBtn" class="search-btn" type="button">Search</button>
+        </div>
+
+        <div class="search-note">
+          Example: store.myshopify.com or https://store.com
+        </div>
+      </div>
+
+      <div id="results"></div>
     </main>
 
   </div>
