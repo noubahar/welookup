@@ -234,7 +234,8 @@ function rankShopRowsForNeedle(rows, needleLower) {
     const pf = String(r.platform_domain || "").toLowerCase();
     const tit = String(r.title || "").toLowerCase();
     let s = 0;
-    if (pf.includes(n)) s -= 4;
+    if (pf.includes(`-${n}.myshopify.com`) || pf.endsWith(`-${n}.myshopify.com`)) s -= 8;
+    else if (pf.includes(n)) s -= 4;
     if (tit.includes(n)) s -= 2;
     return s;
   };
@@ -255,12 +256,20 @@ async function searchRankedSubstringCandidates(env, query) {
   if (needle.length < 2) return [];
 
   const hyphenPat = `%-${frag}%`;
+  const shopifySlugPat = `%-${frag}.myshopify.com`;
 
-  const [slugRes, domRes, platRes] = await Promise.all([
+  const [shopifySlugRes, slugRes, domRes, platRes] = await Promise.all([
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       LIMIT 120`
+       LIMIT 200`
+    )
+      .bind(shopifySlugPat)
+      .all(),
+    env.DB.prepare(
+      `SELECT id FROM shops
+       WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
+       LIMIT 200`
     )
       .bind(hyphenPat)
       .all(),
@@ -288,6 +297,7 @@ async function searchRankedSubstringCandidates(env, query) {
     ids.push(v);
   };
 
+  for (const r of shopifySlugRes.results || []) pushId(r.id);
   for (const r of slugRes.results || []) pushId(r.id);
   for (const r of domRes.results || []) pushId(r.id);
   for (const r of platRes.results || []) pushId(r.id);
