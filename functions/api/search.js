@@ -262,7 +262,15 @@ async function searchRankedSubstringCandidates(env, query) {
   /** Matches cuddleandkind.com ("kind."), not only hyphenated "-kind." */
   const domainKindDotPat = `%${frag}.%`;
 
-  const [shopifySlugRes, hyphenDotRes, domainDotRes, slugRes, domRes, platRes] = await Promise.all([
+  const [domainDotRes, shopifySlugRes, hyphenDotRes, domRes, slugRes, platRes] = await Promise.all([
+    env.DB.prepare(
+      `SELECT DISTINCT shop_id AS id FROM shop_domains
+       WHERE lower(domain) LIKE ? ESCAPE '\\'
+       ORDER BY length(domain) ASC
+       LIMIT 300`
+    )
+      .bind(domainKindDotPat)
+      .all(),
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
@@ -281,29 +289,21 @@ async function searchRankedSubstringCandidates(env, query) {
     env.DB.prepare(
       `SELECT DISTINCT shop_id AS id FROM shop_domains
        WHERE lower(domain) LIKE ? ESCAPE '\\'
-       ORDER BY length(domain) ASC
-       LIMIT 250`
-    )
-      .bind(domainKindDotPat)
-      .all(),
-    env.DB.prepare(
-      `SELECT id FROM shops
-       WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
        LIMIT 200`
-    )
-      .bind(hyphenPat)
-      .all(),
-    env.DB.prepare(
-      `SELECT DISTINCT shop_id AS id FROM shop_domains
-       WHERE lower(domain) LIKE ? ESCAPE '\\'
-       LIMIT 400`
     )
       .bind(`%${frag}%`)
       .all(),
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       LIMIT 400`
+       LIMIT 120`
+    )
+      .bind(hyphenPat)
+      .all(),
+    env.DB.prepare(
+      `SELECT id FROM shops
+       WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
+       LIMIT 120`
     )
       .bind(`%${frag}%`)
       .all(),
@@ -317,14 +317,14 @@ async function searchRankedSubstringCandidates(env, query) {
     ids.push(v);
   };
 
+  for (const r of domainDotRes.results || []) pushId(r.id);
   for (const r of shopifySlugRes.results || []) pushId(r.id);
   for (const r of hyphenDotRes.results || []) pushId(r.id);
-  for (const r of domainDotRes.results || []) pushId(r.id);
-  for (const r of slugRes.results || []) pushId(r.id);
   for (const r of domRes.results || []) pushId(r.id);
+  for (const r of slugRes.results || []) pushId(r.id);
   for (const r of platRes.results || []) pushId(r.id);
 
-  const idList = ids.slice(0, 520);
+  const idList = ids.slice(0, 640);
   if (!idList.length) return [];
 
   const chunkSize = 80;
