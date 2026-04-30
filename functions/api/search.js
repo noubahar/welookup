@@ -154,7 +154,8 @@ async function searchLikeDomain(env, query) {
     FROM shop_domains d
     JOIN shops s ON s.id = d.shop_id
     WHERE d.domain LIKE ? ESCAPE '\\'
-    LIMIT 24`
+    ORDER BY length(d.domain) ASC
+    LIMIT 16`
   );
   const result = await stmt.bind(`${frag}%`).all();
   return result.results || [];
@@ -167,7 +168,8 @@ async function searchContainsDomain(env, query) {
     FROM shop_domains d
     JOIN shops s ON s.id = d.shop_id
     WHERE d.domain LIKE ? ESCAPE '\\'
-    LIMIT 24`
+    ORDER BY length(d.domain) ASC
+    LIMIT 14`
   );
   const result = await stmt.bind(`%${frag}%`).all();
   return result.results || [];
@@ -190,7 +192,8 @@ async function searchLikePlatformDomain(env, query) {
     `${SHOP_SELECT}
     FROM shops s
     WHERE lower(coalesce(s.platform_domain,'')) LIKE ? ESCAPE '\\'
-    LIMIT 24`
+    ORDER BY length(coalesce(s.platform_domain, '')) ASC
+    LIMIT 16`
   );
   const result = await stmt.bind(`${frag}%`).all();
   return result.results || [];
@@ -202,7 +205,8 @@ async function searchContainsPlatformDomain(env, query) {
     `${SHOP_SELECT}
     FROM shops s
     WHERE lower(coalesce(s.platform_domain,'')) LIKE ? ESCAPE '\\'
-    LIMIT 24`
+    ORDER BY length(coalesce(s.platform_domain, '')) ASC
+    LIMIT 14`
   );
   const result = await stmt.bind(`%${frag}%`).all();
   return result.results || [];
@@ -214,7 +218,8 @@ async function searchTitle(env, query) {
     `${SHOP_SELECT}
     FROM shops s
     WHERE lower(s.title) LIKE ? ESCAPE '\\'
-    LIMIT 24`
+    ORDER BY length(coalesce(s.title, '')) ASC
+    LIMIT 16`
   );
   const result = await stmt.bind(`${frag}%`).all();
   return result.results || [];
@@ -229,13 +234,17 @@ const HAYSTACK_SQL = `lower(
 
 async function searchContainsHaystack(env, query) {
   const frag = likeFragment(query);
+  const needle = query.toLowerCase();
   const stmt = env.DB.prepare(
     `${SHOP_SELECT}
     FROM shops s
     WHERE ${HAYSTACK_SQL} LIKE ? ESCAPE '\\'
+    ORDER BY
+      CASE WHEN instr(lower(coalesce(s.platform_domain, '')), ?) > 0 THEN 0 ELSE 1 END ASC,
+      length(coalesce(s.title, '')) ASC
     LIMIT 24`
   );
-  const result = await stmt.bind(`%${frag}%`).all();
+  const result = await stmt.bind(`%${frag}%`, needle).all();
   return result.results || [];
 }
 
@@ -251,15 +260,18 @@ async function searchHaystackTokensAnd(env, tokens) {
   if (!cleaned.length) return [];
 
   if (cleaned.length === 1) {
-    const t = likeFragment(cleaned[0]);
+    const rawTok = cleaned[0];
+    const t = likeFragment(rawTok);
     const stmt = env.DB.prepare(
       `${SHOP_SELECT}
       FROM shops s
       WHERE ${HAYSTACK_SQL} LIKE ? ESCAPE '\\'
-      ORDER BY length(coalesce(s.title, '')) ASC
+      ORDER BY
+        CASE WHEN instr(lower(coalesce(s.platform_domain, '')), ?) > 0 THEN 0 ELSE 1 END ASC,
+        length(coalesce(s.title, '')) ASC
       LIMIT 24`
     );
-    const result = await stmt.bind(`%${t}%`).all();
+    const result = await stmt.bind(`%${t}%`, rawTok.toLowerCase()).all();
     return result.results || [];
   }
 
@@ -289,7 +301,7 @@ async function searchBroadNormalizedHaystack(env, needle) {
         coalesce(s.platform_domain,'') || substr(coalesce(s.description,''),1,300),
         ' ', ''), '-', ''), '&', ''), '.', ''), ',', ''), '''', ''), '/', ''), '_', '')
     ), ?) > 0
-    LIMIT 24`
+    LIMIT 16`
   );
   const result = await stmt.bind(n).all();
   return result.results || [];
@@ -368,29 +380,23 @@ export async function onRequestGet(context) {
   try {
     const tokens = extractSearchTokens(rawQuery, query);
 
-    const [exactD, exactP, likeD, likeP] = await Promise.all([
+    // Fast path: exact host only (2 queries), skip scans when we already know the shop.
+    const [exactD, exactP] = await Promise.all([
       searchExactDomain(env, query),
       searchExactPlatformDomain(env, query),
-      searchLikeDomain(env, query),
-      searchLikePlatformDomain(env, query),
     ]);
+    let results = mergeShopRows([exactD, exactP], MAX_RESULTS);
 
-    let results = mergeShopRows([exactD, exactP, likeD, likeP], MAX_RESULTS);
-
-    if (results.length < MAX_RESULTS && query.length >= 3) {
-      const [containD, containP] = await Promise.all([
-        searchContainsDomain(env, query),
-        searchContainsPlatformDomain(env, query),
+    if (results.length === 0) {
+      const [likeD, likeP] = await Promise.all([
+        searchLikeDomain(env, query),
+        searchLikePlatformDomain(env, query),
       ]);
-      results = appendDedup(results, containD, MAX_RESULTS);
-      results = appendDedup(results, containP, MAX_RESULTS);
+      results = mergeShopRows([likeD, likeP], MAX_RESULTS);
     }
 
-    if (results.length < MAX_RESULTS) {
-      const titleHits = await searchTitle(env, query);
-      results = appendDedup(results, titleHits, MAX_RESULTS);
-    }
-
+    // Haystack + token matches before unconstrained domain substring scans so short
+    // queries like "kind" still surface brand rows (title / platform_domain) first.
     if (results.length < MAX_RESULTS && query.length >= 3) {
       const hay = await searchContainsHaystack(env, query);
       results = appendDedup(results, hay, MAX_RESULTS);
@@ -399,6 +405,20 @@ export async function onRequestGet(context) {
     if (results.length < MAX_RESULTS && tokens.length) {
       const tokenHits = await searchHaystackTokensAnd(env, tokens);
       results = appendDedup(results, tokenHits, MAX_RESULTS);
+    }
+
+    if (results.length < MAX_RESULTS) {
+      const titleHits = await searchTitle(env, query);
+      results = appendDedup(results, titleHits, MAX_RESULTS);
+    }
+
+    if (results.length < MAX_RESULTS && query.length >= 3) {
+      const [containD, containP] = await Promise.all([
+        searchContainsDomain(env, query),
+        searchContainsPlatformDomain(env, query),
+      ]);
+      results = appendDedup(results, containD, MAX_RESULTS);
+      results = appendDedup(results, containP, MAX_RESULTS);
     }
 
     if (results.length < MAX_RESULTS) {
