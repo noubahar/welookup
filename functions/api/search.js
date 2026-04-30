@@ -292,13 +292,18 @@ async function searchRankedSubstringCandidates(env, query) {
   for (const r of domRes.results || []) pushId(r.id);
   for (const r of platRes.results || []) pushId(r.id);
 
-  const idList = ids.slice(0, 500);
+  const idList = ids.slice(0, 360);
   if (!idList.length) return [];
 
-  const ph = idList.map(() => "?").join(",");
-  const stmt = env.DB.prepare(`${SHOP_SELECT} FROM shops s WHERE s.id IN (${ph})`);
-  const load = await stmt.bind(...idList).all();
-  const rows = load.results || [];
+  const chunkSize = 80;
+  const rows = [];
+  for (let i = 0; i < idList.length; i += chunkSize) {
+    const chunk = idList.slice(i, i + chunkSize);
+    const ph = chunk.map(() => "?").join(",");
+    const stmt = env.DB.prepare(`${SHOP_SELECT} FROM shops s WHERE s.id IN (${ph})`);
+    const load = await stmt.bind(...chunk).all();
+    rows.push(...(load.results || []));
+  }
   return rankShopRowsForNeedle(rows, needle).slice(0, MAX_RESULTS);
 }
 
