@@ -9,7 +9,8 @@ const DEFAULT_SEARCH_ENDPOINTS = [
   "/api/search",
   "https://welookup-website.pages.dev/api/search",
 ];
-const REQUEST_TIMEOUT_MS = 2200;
+/** D1 search can take several seconds (cold start + parallel queries); keep above typical latency. */
+const REQUEST_TIMEOUT_MS = 45000;
 let preferredEndpoint = "";
 
 function escapeHtml(value) {
@@ -208,8 +209,11 @@ async function runSearch() {
     renderResults(payload.results || [], query, payload.normalizedQuery || query);
   } catch (error) {
     elements.results.innerHTML = "";
+    const timedOut = error && error.name === "AbortError";
     setFeedback(
-      "Search is temporarily unavailable. Please try again in a few moments.",
+      timedOut
+        ? "Search timed out before results arrived. Please try again."
+        : "Search is temporarily unavailable. Please try again in a few moments.",
       true
     );
     console.error(error);
