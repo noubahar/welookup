@@ -154,7 +154,6 @@ async function searchLikeDomain(env, query) {
     FROM shop_domains d
     JOIN shops s ON s.id = d.shop_id
     WHERE d.domain LIKE ? ESCAPE '\\'
-    ORDER BY length(d.domain) ASC
     LIMIT 16`
   );
   const result = await stmt.bind(`${frag}%`).all();
@@ -168,7 +167,6 @@ async function searchContainsDomain(env, query) {
     FROM shop_domains d
     JOIN shops s ON s.id = d.shop_id
     WHERE d.domain LIKE ? ESCAPE '\\'
-    ORDER BY length(d.domain) ASC
     LIMIT 14`
   );
   const result = await stmt.bind(`%${frag}%`).all();
@@ -192,7 +190,6 @@ async function searchLikePlatformDomain(env, query) {
     `${SHOP_SELECT}
     FROM shops s
     WHERE lower(coalesce(s.platform_domain,'')) LIKE ? ESCAPE '\\'
-    ORDER BY length(coalesce(s.platform_domain, '')) ASC
     LIMIT 16`
   );
   const result = await stmt.bind(`${frag}%`).all();
@@ -205,7 +202,6 @@ async function searchContainsPlatformDomain(env, query) {
     `${SHOP_SELECT}
     FROM shops s
     WHERE lower(coalesce(s.platform_domain,'')) LIKE ? ESCAPE '\\'
-    ORDER BY length(coalesce(s.platform_domain, '')) ASC
     LIMIT 14`
   );
   const result = await stmt.bind(`%${frag}%`).all();
@@ -218,7 +214,6 @@ async function searchTitle(env, query) {
     `${SHOP_SELECT}
     FROM shops s
     WHERE lower(s.title) LIKE ? ESCAPE '\\'
-    ORDER BY length(coalesce(s.title, '')) ASC
     LIMIT 16`
   );
   const result = await stmt.bind(`${frag}%`).all();
@@ -232,19 +227,90 @@ const HAYSTACK_SQL = `lower(
   substr(coalesce(s.description,''), 1, 500)
 )`;
 
-async function searchContainsHaystack(env, query) {
+/** Rank a small in-memory list: platform + title hits, then shorter title (brand-like). */
+function rankShopRowsForNeedle(rows, needleLower) {
+  const n = needleLower;
+  const score = (r) => {
+    const pf = String(r.platform_domain || "").toLowerCase();
+    const tit = String(r.title || "").toLowerCase();
+    let s = 0;
+    if (pf.includes(n)) s -= 4;
+    if (tit.includes(n)) s -= 2;
+    return s;
+  };
+  return [...rows].sort((a, b) => {
+    const d = score(a) - score(b);
+    if (d !== 0) return d;
+    return String(a.title || "").length - String(b.title || "").length;
+  });
+}
+
+/**
+ * Short substring queries: cap domain/platform fan-out, load those shops only, then rank in JS.
+ * Avoids global ORDER BY over millions of haystack LIKE rows (very slow on D1).
+ */
+async function searchRankedSubstringCandidates(env, query) {
   const frag = likeFragment(query);
   const needle = query.toLowerCase();
+  if (needle.length < 2) return [];
+
+  const hyphenPat = `%-${frag}%`;
+
+  const [slugRes, domRes, platRes] = await Promise.all([
+    env.DB.prepare(
+      `SELECT id FROM shops
+       WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
+       LIMIT 120`
+    )
+      .bind(hyphenPat)
+      .all(),
+    env.DB.prepare(
+      `SELECT DISTINCT shop_id AS id FROM shop_domains
+       WHERE domain LIKE ? ESCAPE '\\'
+       LIMIT 400`
+    )
+      .bind(`%${frag}%`)
+      .all(),
+    env.DB.prepare(
+      `SELECT id FROM shops
+       WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
+       LIMIT 400`
+    )
+      .bind(`%${frag}%`)
+      .all(),
+  ]);
+
+  const ids = [];
+  const seen = new Set();
+  const pushId = (v) => {
+    if (v == null || seen.has(v)) return;
+    seen.add(v);
+    ids.push(v);
+  };
+
+  for (const r of slugRes.results || []) pushId(r.id);
+  for (const r of domRes.results || []) pushId(r.id);
+  for (const r of platRes.results || []) pushId(r.id);
+
+  const idList = ids.slice(0, 500);
+  if (!idList.length) return [];
+
+  const ph = idList.map(() => "?").join(",");
+  const stmt = env.DB.prepare(`${SHOP_SELECT} FROM shops s WHERE s.id IN (${ph})`);
+  const load = await stmt.bind(...idList).all();
+  const rows = load.results || [];
+  return rankShopRowsForNeedle(rows, needle).slice(0, MAX_RESULTS);
+}
+
+async function searchContainsHaystack(env, query) {
+  const frag = likeFragment(query);
   const stmt = env.DB.prepare(
     `${SHOP_SELECT}
     FROM shops s
     WHERE ${HAYSTACK_SQL} LIKE ? ESCAPE '\\'
-    ORDER BY
-      CASE WHEN instr(lower(coalesce(s.platform_domain, '')), ?) > 0 THEN 0 ELSE 1 END ASC,
-      length(coalesce(s.title, '')) ASC
-    LIMIT 24`
+    LIMIT 16`
   );
-  const result = await stmt.bind(`%${frag}%`, needle).all();
+  const result = await stmt.bind(`%${frag}%`).all();
   return result.results || [];
 }
 
@@ -266,12 +332,9 @@ async function searchHaystackTokensAnd(env, tokens) {
       `${SHOP_SELECT}
       FROM shops s
       WHERE ${HAYSTACK_SQL} LIKE ? ESCAPE '\\'
-      ORDER BY
-        CASE WHEN instr(lower(coalesce(s.platform_domain, '')), ?) > 0 THEN 0 ELSE 1 END ASC,
-        length(coalesce(s.title, '')) ASC
-      LIMIT 24`
+      LIMIT 16`
     );
-    const result = await stmt.bind(`%${t}%`, rawTok.toLowerCase()).all();
+    const result = await stmt.bind(`%${t}%`).all();
     return result.results || [];
   }
 
@@ -395,8 +458,13 @@ export async function onRequestGet(context) {
       results = mergeShopRows([likeD, likeP], MAX_RESULTS);
     }
 
-    // Haystack + token matches before unconstrained domain substring scans so short
-    // queries like "kind" still surface brand rows (title / platform_domain) first.
+    // Capped domain + platform substring → rank in JS (fast, surfaces e.g. cuddle-and-kind for "kind").
+    if (results.length < MAX_RESULTS && query.length >= 3) {
+      const rankedSubs = await searchRankedSubstringCandidates(env, query);
+      results = appendDedup(results, rankedSubs, MAX_RESULTS);
+    }
+
+    // Haystack / tokens before last-resort unconstrained domain rows.
     if (results.length < MAX_RESULTS && query.length >= 3) {
       const hay = await searchContainsHaystack(env, query);
       results = appendDedup(results, hay, MAX_RESULTS);
