@@ -259,23 +259,29 @@ async function searchRankedSubstringCandidates(env, query) {
   const shopifySlugPat = `%-${frag}.myshopify.com`;
   /** Matches e.g. cuddle-and-kind.myshopify.com (hyphen + needle + dot). */
   const hyphenDotPat = `%-${frag}.%`;
+  const domainDotPat = `%-${frag}.%`;
 
-  const [shopifySlugRes, hyphenDotRes, slugRes, domRes, platRes] = await Promise.all([
+  const [shopifySlugRes, hyphenDotRes, domainDotRes, slugRes, domRes, platRes] = await Promise.all([
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       ORDER BY length(coalesce(platform_domain,'')) ASC
-       LIMIT 60`
+       LIMIT 120`
     )
       .bind(shopifySlugPat)
       .all(),
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       ORDER BY length(coalesce(platform_domain,'')) ASC
-       LIMIT 80`
+       LIMIT 160`
     )
       .bind(hyphenDotPat)
+      .all(),
+    env.DB.prepare(
+      `SELECT DISTINCT shop_id AS id FROM shop_domains
+       WHERE lower(domain) LIKE ? ESCAPE '\\'
+       LIMIT 200`
+    )
+      .bind(domainDotPat)
       .all(),
     env.DB.prepare(
       `SELECT id FROM shops
@@ -286,7 +292,7 @@ async function searchRankedSubstringCandidates(env, query) {
       .all(),
     env.DB.prepare(
       `SELECT DISTINCT shop_id AS id FROM shop_domains
-       WHERE domain LIKE ? ESCAPE '\\'
+       WHERE lower(domain) LIKE ? ESCAPE '\\'
        LIMIT 400`
     )
       .bind(`%${frag}%`)
@@ -310,11 +316,12 @@ async function searchRankedSubstringCandidates(env, query) {
 
   for (const r of shopifySlugRes.results || []) pushId(r.id);
   for (const r of hyphenDotRes.results || []) pushId(r.id);
+  for (const r of domainDotRes.results || []) pushId(r.id);
   for (const r of slugRes.results || []) pushId(r.id);
   for (const r of domRes.results || []) pushId(r.id);
   for (const r of platRes.results || []) pushId(r.id);
 
-  const idList = ids.slice(0, 360);
+  const idList = ids.slice(0, 520);
   if (!idList.length) return [];
 
   const chunkSize = 80;
