@@ -5,10 +5,12 @@ const elements = {
   feedback: document.getElementById("feedback"),
 };
 
-const SEARCH_ENDPOINTS = [
+const DEFAULT_SEARCH_ENDPOINTS = [
   "/api/search",
   "https://welookup-website.pages.dev/api/search",
 ];
+const REQUEST_TIMEOUT_MS = 2200;
+let preferredEndpoint = "";
 
 function escapeHtml(value) {
   return String(value)
@@ -55,6 +57,32 @@ function pickTopLinks(links) {
 function setFeedback(message, isError = false) {
   elements.feedback.className = isError ? "search-feedback error" : "search-feedback";
   elements.feedback.textContent = message || "";
+}
+
+function buildEndpointOrder() {
+  if (preferredEndpoint) {
+    return [preferredEndpoint, ...DEFAULT_SEARCH_ENDPOINTS.filter((x) => x !== preferredEndpoint)];
+  }
+
+  // welookup.info is currently served by GitHub Pages, so skip /api there.
+  if (location.hostname === "welookup.info" || location.hostname === "www.welookup.info") {
+    return [
+      "https://welookup-website.pages.dev/api/search",
+      "/api/search",
+    ];
+  }
+
+  return DEFAULT_SEARCH_ENDPOINTS;
+}
+
+async function fetchWithTimeout(url, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function renderResults(items, query, normalizedQuery) {
@@ -142,20 +170,31 @@ async function runSearch() {
     return;
   }
 
+  if (query.length < 2) {
+    elements.results.innerHTML = "";
+    setFeedback("Type at least 2 characters.");
+    return;
+  }
+
   elements.button.disabled = true;
   setFeedback("Searching...", false);
 
   try {
     let payload = null;
     let lastError = null;
+    const endpoints = buildEndpointOrder();
 
-    for (const baseUrl of SEARCH_ENDPOINTS) {
+    for (const baseUrl of endpoints) {
       try {
-        const response = await fetch(`${baseUrl}?q=${encodeURIComponent(query)}`);
+        const response = await fetchWithTimeout(
+          `${baseUrl}?q=${encodeURIComponent(query)}`,
+          REQUEST_TIMEOUT_MS
+        );
         if (!response.ok) {
           throw new Error(`Search API failed (${response.status}) at ${baseUrl}`);
         }
         payload = await response.json();
+        preferredEndpoint = baseUrl;
         break;
       } catch (endpointError) {
         lastError = endpointError;

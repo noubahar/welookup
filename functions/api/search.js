@@ -14,7 +14,7 @@ function json(data, status = 200) {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "cache-control": "public, max-age=120",
+      "cache-control": "public, max-age=180, s-maxage=180",
       "access-control-allow-origin": "*",
     },
   });
@@ -44,6 +44,7 @@ async function searchExactDomain(env, query) {
 }
 
 async function searchLikeDomain(env, query) {
+  // Prefix search usually hits indexes better than %query%.
   const stmt = env.DB.prepare(
     `SELECT
       s.id,
@@ -60,7 +61,30 @@ async function searchLikeDomain(env, query) {
     FROM shop_domains d
     JOIN shops s ON s.id = d.shop_id
     WHERE d.domain LIKE ?
-    LIMIT 20`
+    LIMIT 16`
+  );
+  const result = await stmt.bind(`${query}%`).all();
+  return result.results || [];
+}
+
+async function searchContainsDomain(env, query) {
+  const stmt = env.DB.prepare(
+    `SELECT
+      s.id,
+      s.title,
+      s.description,
+      s.platform,
+      s.platform_domain,
+      s.country_code,
+      s.currency_code,
+      s.language_code,
+      s.location,
+      s.created_at,
+      s.state
+    FROM shop_domains d
+    JOIN shops s ON s.id = d.shop_id
+    WHERE d.domain LIKE ?
+    LIMIT 16`
   );
   const result = await stmt.bind(`%${query}%`).all();
   return result.results || [];
@@ -82,7 +106,29 @@ async function searchTitle(env, query) {
       s.state
     FROM shops s
     WHERE lower(s.title) LIKE ?
-    LIMIT 20`
+    LIMIT 12`
+  );
+  const result = await stmt.bind(`${query}%`).all();
+  return result.results || [];
+}
+
+async function searchContainsTitle(env, query) {
+  const stmt = env.DB.prepare(
+    `SELECT
+      s.id,
+      s.title,
+      s.description,
+      s.platform,
+      s.platform_domain,
+      s.country_code,
+      s.currency_code,
+      s.language_code,
+      s.location,
+      s.created_at,
+      s.state
+    FROM shops s
+    WHERE lower(s.title) LIKE ?
+    LIMIT 12`
   );
   const result = await stmt.bind(`%${query}%`).all();
   return result.results || [];
@@ -92,18 +138,23 @@ async function enrichByShopIds(env, shopIds) {
   if (!shopIds.length) return {};
 
   const placeholders = shopIds.map(() => "?").join(",");
+  const perShopDomainCap = 16;
+  const perShopLinkCap = 12;
+  const domainLimit = shopIds.length * perShopDomainCap;
+  const linksLimit = shopIds.length * perShopLinkCap;
+
   const domainsStmt = env.DB.prepare(
     `SELECT shop_id, domain, source_field
      FROM shop_domains
      WHERE shop_id IN (${placeholders})
-     LIMIT 400`
+     LIMIT ${domainLimit}`
   ).bind(...shopIds);
 
   const linksStmt = env.DB.prepare(
     `SELECT shop_id, link, source_field, link_type
      FROM shop_links
      WHERE shop_id IN (${placeholders})
-     LIMIT 400`
+     LIMIT ${linksLimit}`
   ).bind(...shopIds);
 
   const [domainsRes, linksRes] = await Promise.all([domainsStmt.all(), linksStmt.all()]);
@@ -115,7 +166,7 @@ async function enrichByShopIds(env, shopIds) {
 
   for (const row of domainsRes.results || []) {
     const target = byShop[row.shop_id]?.domains;
-    if (!target || target.length >= 24) continue;
+    if (!target || target.length >= perShopDomainCap) continue;
     target.push({
       domain: row.domain,
       source: row.source_field,
@@ -124,7 +175,7 @@ async function enrichByShopIds(env, shopIds) {
 
   for (const row of linksRes.results || []) {
     const target = byShop[row.shop_id]?.links;
-    if (!target || target.length >= 16) continue;
+    if (!target || target.length >= perShopLinkCap) continue;
     target.push({
       link: row.link,
       source: row.source_field,
@@ -149,6 +200,9 @@ export async function onRequestGet(context) {
   if (!query) {
     return json({ query: rawQuery, normalizedQuery: query, results: [] });
   }
+  if (query.length < 2) {
+    return json({ query: rawQuery, normalizedQuery: query, results: [] });
+  }
 
   try {
     const exact = await searchExactDomain(env, query);
@@ -159,9 +213,19 @@ export async function onRequestGet(context) {
       results = like;
     }
 
+    if (results.length === 0 && query.length >= 3) {
+      const containsDomain = await searchContainsDomain(env, query);
+      results = containsDomain;
+    }
+
     if (results.length === 0) {
       const titleMatches = await searchTitle(env, query);
       results = titleMatches;
+    }
+
+    if (results.length === 0 && query.length >= 3) {
+      const containsTitle = await searchContainsTitle(env, query);
+      results = containsTitle;
     }
 
     const deduped = [];
