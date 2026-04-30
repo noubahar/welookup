@@ -5,6 +5,11 @@ const elements = {
   feedback: document.getElementById("feedback"),
 };
 
+const SEARCH_ENDPOINTS = [
+  "/api/search",
+  "https://welookup-website.pages.dev/api/search",
+];
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -141,11 +146,26 @@ async function runSearch() {
   setFeedback("Searching...", false);
 
   try {
-    const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-    if (!response.ok) {
-      throw new Error(`Search API failed (${response.status})`);
+    let payload = null;
+    let lastError = null;
+
+    for (const baseUrl of SEARCH_ENDPOINTS) {
+      try {
+        const response = await fetch(`${baseUrl}?q=${encodeURIComponent(query)}`);
+        if (!response.ok) {
+          throw new Error(`Search API failed (${response.status}) at ${baseUrl}`);
+        }
+        payload = await response.json();
+        break;
+      } catch (endpointError) {
+        lastError = endpointError;
+      }
     }
-    const payload = await response.json();
+
+    if (!payload) {
+      throw lastError || new Error("All search endpoints failed");
+    }
+
     renderResults(payload.results || [], query, payload.normalizedQuery || query);
   } catch (error) {
     elements.results.innerHTML = "";
