@@ -259,7 +259,8 @@ async function searchRankedSubstringCandidates(env, query) {
   const shopifySlugPat = `%-${frag}.myshopify.com`;
   /** Matches e.g. cuddle-and-kind.myshopify.com (hyphen + needle + dot). */
   const hyphenDotPat = `%-${frag}.%`;
-  const domainDotPat = `%-${frag}.%`;
+  /** Matches cuddleandkind.com ("kind."), not only hyphenated "-kind." */
+  const domainKindDotPat = `%${frag}.%`;
 
   const [shopifySlugRes, hyphenDotRes, domainDotRes, slugRes, domRes, platRes] = await Promise.all([
     env.DB.prepare(
@@ -272,16 +273,18 @@ async function searchRankedSubstringCandidates(env, query) {
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       LIMIT 160`
+       ORDER BY length(coalesce(platform_domain,'')) ASC
+       LIMIT 100`
     )
       .bind(hyphenDotPat)
       .all(),
     env.DB.prepare(
       `SELECT DISTINCT shop_id AS id FROM shop_domains
        WHERE lower(domain) LIKE ? ESCAPE '\\'
-       LIMIT 200`
+       ORDER BY length(domain) ASC
+       LIMIT 250`
     )
-      .bind(domainDotPat)
+      .bind(domainKindDotPat)
       .all(),
     env.DB.prepare(
       `SELECT id FROM shops
