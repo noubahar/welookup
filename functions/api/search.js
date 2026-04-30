@@ -32,6 +32,7 @@ const STOPWORDS = new Set([
   "inc",
   "llc",
   "ltd",
+  "myshopify",
 ]);
 
 /**
@@ -84,9 +85,44 @@ function json(data, status = 200) {
   });
 }
 
-async function searchExactDomain(env, query) {
-  const stmt = env.DB.prepare(
-    `SELECT
+const MAX_RESULTS = 24;
+
+/** Escape `%` and `_` for SQL LIKE (bind with ESCAPE '\\'). */
+function likeFragment(raw) {
+  return String(raw)
+    .replace(/\\/g, "\\\\")
+    .replace(/%/g, "\\%")
+    .replace(/_/g, "\\_");
+}
+
+function mergeShopRows(priorityArrays, cap) {
+  const seen = new Set();
+  const out = [];
+  for (const rows of priorityArrays) {
+    if (!rows) continue;
+    for (const row of rows) {
+      if (!row?.id || seen.has(row.id)) continue;
+      seen.add(row.id);
+      out.push(row);
+      if (out.length >= cap) return out;
+    }
+  }
+  return out;
+}
+
+function appendDedup(base, extraRows, cap) {
+  const seen = new Set(base.map((r) => r.id));
+  const out = [...base];
+  for (const row of extraRows || []) {
+    if (!row?.id || seen.has(row.id)) continue;
+    seen.add(row.id);
+    out.push(row);
+    if (out.length >= cap) break;
+  }
+  return out;
+}
+
+const SHOP_SELECT = `SELECT
       s.id,
       s.title,
       s.description,
@@ -97,7 +133,11 @@ async function searchExactDomain(env, query) {
       s.language_code,
       s.location,
       s.created_at,
-      s.state
+      s.state`;
+
+async function searchExactDomain(env, query) {
+  const stmt = env.DB.prepare(
+    `${SHOP_SELECT}
     FROM shop_domains d
     JOIN shops s ON s.id = d.shop_id
     WHERE d.domain = ?
@@ -108,71 +148,75 @@ async function searchExactDomain(env, query) {
 }
 
 async function searchLikeDomain(env, query) {
-  // Prefix search usually hits indexes better than %query%.
+  const frag = likeFragment(query);
   const stmt = env.DB.prepare(
-    `SELECT
-      s.id,
-      s.title,
-      s.description,
-      s.platform,
-      s.platform_domain,
-      s.country_code,
-      s.currency_code,
-      s.language_code,
-      s.location,
-      s.created_at,
-      s.state
+    `${SHOP_SELECT}
     FROM shop_domains d
     JOIN shops s ON s.id = d.shop_id
-    WHERE d.domain LIKE ?
-    LIMIT 16`
+    WHERE d.domain LIKE ? ESCAPE '\\'
+    LIMIT 24`
   );
-  const result = await stmt.bind(`${query}%`).all();
+  const result = await stmt.bind(`${frag}%`).all();
   return result.results || [];
 }
 
 async function searchContainsDomain(env, query) {
+  const frag = likeFragment(query);
   const stmt = env.DB.prepare(
-    `SELECT
-      s.id,
-      s.title,
-      s.description,
-      s.platform,
-      s.platform_domain,
-      s.country_code,
-      s.currency_code,
-      s.language_code,
-      s.location,
-      s.created_at,
-      s.state
+    `${SHOP_SELECT}
     FROM shop_domains d
     JOIN shops s ON s.id = d.shop_id
-    WHERE d.domain LIKE ?
-    LIMIT 16`
+    WHERE d.domain LIKE ? ESCAPE '\\'
+    LIMIT 24`
   );
-  const result = await stmt.bind(`%${query}%`).all();
+  const result = await stmt.bind(`%${frag}%`).all();
+  return result.results || [];
+}
+
+async function searchExactPlatformDomain(env, query) {
+  const stmt = env.DB.prepare(
+    `${SHOP_SELECT}
+    FROM shops s
+    WHERE lower(trim(coalesce(s.platform_domain,''))) = ?
+    LIMIT 10`
+  );
+  const result = await stmt.bind(query).all();
+  return result.results || [];
+}
+
+async function searchLikePlatformDomain(env, query) {
+  const frag = likeFragment(query);
+  const stmt = env.DB.prepare(
+    `${SHOP_SELECT}
+    FROM shops s
+    WHERE lower(coalesce(s.platform_domain,'')) LIKE ? ESCAPE '\\'
+    LIMIT 24`
+  );
+  const result = await stmt.bind(`${frag}%`).all();
+  return result.results || [];
+}
+
+async function searchContainsPlatformDomain(env, query) {
+  const frag = likeFragment(query);
+  const stmt = env.DB.prepare(
+    `${SHOP_SELECT}
+    FROM shops s
+    WHERE lower(coalesce(s.platform_domain,'')) LIKE ? ESCAPE '\\'
+    LIMIT 24`
+  );
+  const result = await stmt.bind(`%${frag}%`).all();
   return result.results || [];
 }
 
 async function searchTitle(env, query) {
+  const frag = likeFragment(query);
   const stmt = env.DB.prepare(
-    `SELECT
-      s.id,
-      s.title,
-      s.description,
-      s.platform,
-      s.platform_domain,
-      s.country_code,
-      s.currency_code,
-      s.language_code,
-      s.location,
-      s.created_at,
-      s.state
+    `${SHOP_SELECT}
     FROM shops s
-    WHERE lower(s.title) LIKE ?
-    LIMIT 12`
+    WHERE lower(s.title) LIKE ? ESCAPE '\\'
+    LIMIT 24`
   );
-  const result = await stmt.bind(`${query}%`).all();
+  const result = await stmt.bind(`${frag}%`).all();
   return result.results || [];
 }
 
@@ -184,24 +228,14 @@ const HAYSTACK_SQL = `lower(
 )`;
 
 async function searchContainsHaystack(env, query) {
+  const frag = likeFragment(query);
   const stmt = env.DB.prepare(
-    `SELECT
-      s.id,
-      s.title,
-      s.description,
-      s.platform,
-      s.platform_domain,
-      s.country_code,
-      s.currency_code,
-      s.language_code,
-      s.location,
-      s.created_at,
-      s.state
+    `${SHOP_SELECT}
     FROM shops s
-    WHERE ${HAYSTACK_SQL} LIKE ?
-    LIMIT 16`
+    WHERE ${HAYSTACK_SQL} LIKE ? ESCAPE '\\'
+    LIMIT 24`
   );
-  const result = await stmt.bind(`%${query}%`).all();
+  const result = await stmt.bind(`%${frag}%`).all();
   return result.results || [];
 }
 
@@ -217,47 +251,25 @@ async function searchHaystackTokensAnd(env, tokens) {
   if (!cleaned.length) return [];
 
   if (cleaned.length === 1) {
-    const t = cleaned[0];
+    const t = likeFragment(cleaned[0]);
     const stmt = env.DB.prepare(
-      `SELECT
-        s.id,
-        s.title,
-        s.description,
-        s.platform,
-        s.platform_domain,
-        s.country_code,
-        s.currency_code,
-        s.language_code,
-        s.location,
-        s.created_at,
-        s.state
+      `${SHOP_SELECT}
       FROM shops s
-      WHERE ${HAYSTACK_SQL} LIKE ?
+      WHERE ${HAYSTACK_SQL} LIKE ? ESCAPE '\\'
       ORDER BY length(coalesce(s.title, '')) ASC
-      LIMIT 16`
+      LIMIT 24`
     );
     const result = await stmt.bind(`%${t}%`).all();
     return result.results || [];
   }
 
-  const clauses = cleaned.map(() => `${HAYSTACK_SQL} LIKE ?`).join(" AND ");
-  const binds = cleaned.map((t) => `%${t}%`);
+  const clauses = cleaned.map(() => `${HAYSTACK_SQL} LIKE ? ESCAPE '\\'`).join(" AND ");
+  const binds = cleaned.map((t) => `%${likeFragment(t)}%`);
   const stmt = env.DB.prepare(
-    `SELECT
-      s.id,
-      s.title,
-      s.description,
-      s.platform,
-      s.platform_domain,
-      s.country_code,
-      s.currency_code,
-      s.language_code,
-      s.location,
-      s.created_at,
-      s.state
+    `${SHOP_SELECT}
     FROM shops s
     WHERE ${clauses}
-    LIMIT 20`
+    LIMIT 28`
   );
   const result = await stmt.bind(...binds).all();
   return result.results || [];
@@ -269,18 +281,7 @@ async function searchBroadNormalizedHaystack(env, needle) {
   if (n.length < 4) return [];
 
   const stmt = env.DB.prepare(
-    `SELECT
-      s.id,
-      s.title,
-      s.description,
-      s.platform,
-      s.platform_domain,
-      s.country_code,
-      s.currency_code,
-      s.language_code,
-      s.location,
-      s.created_at,
-      s.state
+    `${SHOP_SELECT}
     FROM shops s
     WHERE instr(
       lower(replace(replace(replace(replace(replace(replace(replace(replace(
@@ -288,7 +289,7 @@ async function searchBroadNormalizedHaystack(env, needle) {
         coalesce(s.platform_domain,'') || substr(coalesce(s.description,''),1,300),
         ' ', ''), '-', ''), '&', ''), '.', ''), ',', ''), '''', ''), '/', ''), '_', '')
     ), ?) > 0
-    LIMIT 16`
+    LIMIT 24`
   );
   const result = await stmt.bind(n).all();
   return result.results || [];
@@ -367,50 +368,48 @@ export async function onRequestGet(context) {
   try {
     const tokens = extractSearchTokens(rawQuery, query);
 
-    const exact = await searchExactDomain(env, query);
-    let results = exact;
+    const [exactD, exactP, likeD, likeP] = await Promise.all([
+      searchExactDomain(env, query),
+      searchExactPlatformDomain(env, query),
+      searchLikeDomain(env, query),
+      searchLikePlatformDomain(env, query),
+    ]);
 
-    if (results.length === 0) {
-      const like = await searchLikeDomain(env, query);
-      results = like;
+    let results = mergeShopRows([exactD, exactP, likeD, likeP], MAX_RESULTS);
+
+    if (results.length < MAX_RESULTS && query.length >= 3) {
+      const [containD, containP] = await Promise.all([
+        searchContainsDomain(env, query),
+        searchContainsPlatformDomain(env, query),
+      ]);
+      results = appendDedup(results, containD, MAX_RESULTS);
+      results = appendDedup(results, containP, MAX_RESULTS);
     }
 
-    if (results.length === 0 && query.length >= 3) {
-      const containsDomain = await searchContainsDomain(env, query);
-      results = containsDomain;
+    if (results.length < MAX_RESULTS) {
+      const titleHits = await searchTitle(env, query);
+      results = appendDedup(results, titleHits, MAX_RESULTS);
     }
 
-    if (results.length === 0) {
-      const titleMatches = await searchTitle(env, query);
-      results = titleMatches;
+    if (results.length < MAX_RESULTS && query.length >= 3) {
+      const hay = await searchContainsHaystack(env, query);
+      results = appendDedup(results, hay, MAX_RESULTS);
     }
 
-    if (results.length === 0 && query.length >= 3) {
-      const containsHaystack = await searchContainsHaystack(env, query);
-      results = containsHaystack;
-    }
-
-    if (results.length === 0 && tokens.length) {
+    if (results.length < MAX_RESULTS && tokens.length) {
       const tokenHits = await searchHaystackTokensAnd(env, tokens);
-      results = tokenHits;
+      results = appendDedup(results, tokenHits, MAX_RESULTS);
     }
 
-    if (results.length === 0) {
+    if (results.length < MAX_RESULTS) {
       const broadNeedle = `${rawQuery} ${query}`;
       if (normalizeBroad(broadNeedle).length >= 4) {
         const broad = await searchBroadNormalizedHaystack(env, broadNeedle);
-        results = broad;
+        results = appendDedup(results, broad, MAX_RESULTS);
       }
     }
 
-    const deduped = [];
-    const seen = new Set();
-    for (const item of results) {
-      if (seen.has(item.id)) continue;
-      seen.add(item.id);
-      deduped.push(item);
-      if (deduped.length >= 12) break;
-    }
+    const deduped = results.slice(0, MAX_RESULTS);
 
     const ids = deduped.map((r) => r.id);
     const extras = await enrichByShopIds(env, ids);
