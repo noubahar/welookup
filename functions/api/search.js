@@ -257,14 +257,25 @@ async function searchRankedSubstringCandidates(env, query) {
 
   const hyphenPat = `%-${frag}%`;
   const shopifySlugPat = `%-${frag}.myshopify.com`;
+  /** Matches e.g. cuddle-and-kind.myshopify.com (hyphen + needle + dot). */
+  const hyphenDotPat = `%-${frag}.%`;
 
-  const [shopifySlugRes, slugRes, domRes, platRes] = await Promise.all([
+  const [shopifySlugRes, hyphenDotRes, slugRes, domRes, platRes] = await Promise.all([
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       LIMIT 200`
+       ORDER BY length(coalesce(platform_domain,'')) ASC
+       LIMIT 60`
     )
       .bind(shopifySlugPat)
+      .all(),
+    env.DB.prepare(
+      `SELECT id FROM shops
+       WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
+       ORDER BY length(coalesce(platform_domain,'')) ASC
+       LIMIT 80`
+    )
+      .bind(hyphenDotPat)
       .all(),
     env.DB.prepare(
       `SELECT id FROM shops
@@ -298,6 +309,7 @@ async function searchRankedSubstringCandidates(env, query) {
   };
 
   for (const r of shopifySlugRes.results || []) pushId(r.id);
+  for (const r of hyphenDotRes.results || []) pushId(r.id);
   for (const r of slugRes.results || []) pushId(r.id);
   for (const r of domRes.results || []) pushId(r.id);
   for (const r of platRes.results || []) pushId(r.id);
