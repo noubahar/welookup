@@ -9,6 +9,70 @@ function normalizeQuery(value) {
   return q.trim();
 }
 
+/** Lowercase alphanumerics only — matches “Cuddle & Kind” ↔ “cuddleandkind”. */
+function normalizeBroad(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+const STOPWORDS = new Set([
+  "and",
+  "the",
+  "for",
+  "with",
+  "from",
+  "your",
+  "our",
+  "com",
+  "www",
+  "shop",
+  "store",
+  "online",
+  "inc",
+  "llc",
+  "ltd",
+]);
+
+/**
+ * Tokens for broad AND search (spaces, hyphens, etc.).
+ * Splits “cuddle and kind”, “cuddle-and-kind”, URL path segments.
+ */
+function extractSearchTokens(rawQuery, normalizedHostQuery) {
+  const blob = `${rawQuery} ${normalizedHostQuery}`.toLowerCase();
+  const parts = blob
+    .split(/[^a-z0-9]+/g)
+    .map((t) => t.trim())
+    .filter((t) => t.length >= 2 && !STOPWORDS.has(t));
+
+  const uniq = [];
+  const seen = new Set();
+  for (const p of parts) {
+    if (seen.has(p)) continue;
+    seen.add(p);
+    uniq.push(p);
+  }
+
+  // “cuddleandkind” → try split on embedded “and” (e.g. Cuddle+Kind brand)
+  if (uniq.length === 1) {
+    const mono = uniq[0].replace(/[^a-z0-9]/g, "");
+    const idx = mono.indexOf("and");
+    if (
+      idx >= 4 &&
+      idx + 3 < mono.length &&
+      mono.length >= 8
+    ) {
+      const a = mono.slice(0, idx);
+      const b = mono.slice(idx + 3);
+      if (a.length >= 2 && b.length >= 2) {
+        return [a, b];
+      }
+    }
+  }
+
+  return uniq.slice(0, 6);
+}
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -112,7 +176,14 @@ async function searchTitle(env, query) {
   return result.results || [];
 }
 
-async function searchContainsTitle(env, query) {
+/** Title, name, cluster label, domain, and start of description — broader than title-only. */
+const HAYSTACK_SQL = `lower(
+  coalesce(s.title,'') || ' ' || coalesce(s.name,'') || ' ' ||
+  coalesce(s.cluster_best_ranked,'') || ' ' || coalesce(s.platform_domain,'') || ' ' ||
+  substr(coalesce(s.description,''), 1, 500)
+)`;
+
+async function searchContainsHaystack(env, query) {
   const stmt = env.DB.prepare(
     `SELECT
       s.id,
@@ -127,10 +198,99 @@ async function searchContainsTitle(env, query) {
       s.created_at,
       s.state
     FROM shops s
-    WHERE lower(s.title) LIKE ?
-    LIMIT 12`
+    WHERE ${HAYSTACK_SQL} LIKE ?
+    LIMIT 16`
   );
   const result = await stmt.bind(`%${query}%`).all();
+  return result.results || [];
+}
+
+/**
+ * Every token must appear somewhere in the haystack (AND).
+ * Single token: substring match, ordered by shorter title first (tighter brand-like hits).
+ */
+async function searchHaystackTokensAnd(env, tokens) {
+  const cleaned = tokens
+    .map((t) => String(t).toLowerCase().replace(/[^a-z0-9]/g, ""))
+    .filter((t) => t.length >= 2)
+    .slice(0, 5);
+  if (!cleaned.length) return [];
+
+  if (cleaned.length === 1) {
+    const t = cleaned[0];
+    const stmt = env.DB.prepare(
+      `SELECT
+        s.id,
+        s.title,
+        s.description,
+        s.platform,
+        s.platform_domain,
+        s.country_code,
+        s.currency_code,
+        s.language_code,
+        s.location,
+        s.created_at,
+        s.state
+      FROM shops s
+      WHERE ${HAYSTACK_SQL} LIKE ?
+      ORDER BY length(coalesce(s.title, '')) ASC
+      LIMIT 16`
+    );
+    const result = await stmt.bind(`%${t}%`).all();
+    return result.results || [];
+  }
+
+  const clauses = cleaned.map(() => `${HAYSTACK_SQL} LIKE ?`).join(" AND ");
+  const binds = cleaned.map((t) => `%${t}%`);
+  const stmt = env.DB.prepare(
+    `SELECT
+      s.id,
+      s.title,
+      s.description,
+      s.platform,
+      s.platform_domain,
+      s.country_code,
+      s.currency_code,
+      s.language_code,
+      s.location,
+      s.created_at,
+      s.state
+    FROM shops s
+    WHERE ${clauses}
+    LIMIT 20`
+  );
+  const result = await stmt.bind(...binds).all();
+  return result.results || [];
+}
+
+/** Match when punctuation/spacing differs: “cuddleandkind” vs “Cuddle & Kind” → same broad string. */
+async function searchBroadNormalizedHaystack(env, needle) {
+  const n = normalizeBroad(needle);
+  if (n.length < 4) return [];
+
+  const stmt = env.DB.prepare(
+    `SELECT
+      s.id,
+      s.title,
+      s.description,
+      s.platform,
+      s.platform_domain,
+      s.country_code,
+      s.currency_code,
+      s.language_code,
+      s.location,
+      s.created_at,
+      s.state
+    FROM shops s
+    WHERE instr(
+      lower(replace(replace(replace(replace(replace(replace(replace(replace(
+        coalesce(s.title,'') || coalesce(s.name,'') || coalesce(s.cluster_best_ranked,'') ||
+        coalesce(s.platform_domain,'') || substr(coalesce(s.description,''),1,300),
+        ' ', ''), '-', ''), '&', ''), '.', ''), ',', ''), '''', ''), '/', ''), '_', '')
+    ), ?) > 0
+    LIMIT 16`
+  );
+  const result = await stmt.bind(n).all();
   return result.results || [];
 }
 
@@ -205,6 +365,8 @@ export async function onRequestGet(context) {
   }
 
   try {
+    const tokens = extractSearchTokens(rawQuery, query);
+
     const exact = await searchExactDomain(env, query);
     let results = exact;
 
@@ -224,8 +386,21 @@ export async function onRequestGet(context) {
     }
 
     if (results.length === 0 && query.length >= 3) {
-      const containsTitle = await searchContainsTitle(env, query);
-      results = containsTitle;
+      const containsHaystack = await searchContainsHaystack(env, query);
+      results = containsHaystack;
+    }
+
+    if (results.length === 0 && tokens.length) {
+      const tokenHits = await searchHaystackTokensAnd(env, tokens);
+      results = tokenHits;
+    }
+
+    if (results.length === 0) {
+      const broadNeedle = `${rawQuery} ${query}`;
+      if (normalizeBroad(broadNeedle).length >= 4) {
+        const broad = await searchBroadNormalizedHaystack(env, broadNeedle);
+        results = broad;
+      }
     }
 
     const deduped = [];
