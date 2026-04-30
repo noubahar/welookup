@@ -487,18 +487,18 @@ export async function onRequestGet(context) {
     ]);
     let results = mergeShopRows([exactD, exactP], MAX_RESULTS);
 
+    // Before prefix "kind%" domain scans (which flood generic hits), surface storefront / slug matches.
+    if (results.length < MAX_RESULTS && query.length >= 3) {
+      const rankedSubs = await searchRankedSubstringCandidates(env, query);
+      results = appendDedup(results, rankedSubs, MAX_RESULTS);
+    }
+
     if (results.length === 0) {
       const [likeD, likeP] = await Promise.all([
         searchLikeDomain(env, query),
         searchLikePlatformDomain(env, query),
       ]);
       results = mergeShopRows([likeD, likeP], MAX_RESULTS);
-    }
-
-    // Capped domain + platform substring → rank in JS (fast, surfaces e.g. cuddle-and-kind for "kind").
-    if (results.length < MAX_RESULTS && query.length >= 3) {
-      const rankedSubs = await searchRankedSubstringCandidates(env, query);
-      results = appendDedup(results, rankedSubs, MAX_RESULTS);
     }
 
     // Haystack / tokens before last-resort unconstrained domain rows.
