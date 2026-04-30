@@ -1,0 +1,9 @@
+name = "welookup-website"
+compatibility_date = "2026-04-30"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "welookup-db-v2"
+database_id = "8be7589b-2b2d-407f-a3f9-12f9ab5862ce"
+

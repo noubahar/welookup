@@ -16,37 +16,49 @@
     }
 
     .search-page {
-      padding: 40px 16px 60px;
-      max-width: 900px;
+      padding: 26px 16px 60px;
+      max-width: 1020px;
       margin: 0 auto;
     }
 
     .search-top {
-      text-align: center;
-      margin-top: 40px;
-      margin-bottom: 30px;
+      margin-top: 24px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #cdd6e3;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
     }
 
     .search-top h1 {
-      font-size: 48px;
+      font-size: 46px;
       line-height: 1.05;
-      margin: 0 0 14px;
+      margin: 14px 0 14px;
       font-weight: 800;
     }
 
     .search-top p {
       color: var(--muted);
       font-size: 18px;
-      margin: 0 auto;
-      max-width: 680px;
+      margin: 0;
+      max-width: 780px;
     }
 
     .search-box {
       background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.09);
       border-radius: 18px;
-      padding: 22px;
-      margin-top: 28px;
+      padding: 18px;
+      margin-top: 22px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
     }
 
     .search-row {
@@ -60,7 +72,7 @@
       flex: 1;
       min-width: 260px;
       background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
       color: var(--text);
       border-radius: 14px;
       padding: 16px 18px;
@@ -68,39 +80,147 @@
       outline: none;
     }
 
+    .search-input:focus {
+      border-color: rgba(64, 88, 255, 0.95);
+      box-shadow: 0 0 0 3px rgba(64, 88, 255, 0.16);
+    }
+
     .search-input::placeholder {
       color: var(--muted);
     }
 
     .search-btn {
-      background-color: rgb(64, 88, 255);
+      background: linear-gradient(180deg, #4961ff, #3a4ff0);
       color: white;
       border-radius: 14px;
       padding: 16px 24px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 700;
       border: none;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: transform 0.2s, filter 0.2s;
     }
 
     .search-btn:hover {
-      background-color: rgb(50, 70, 200);
+      filter: brightness(1.05);
+      transform: translateY(-1px);
     }
 
     .search-note {
       color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .search-feedback {
+      margin-top: 18px;
+      color: #d9e2f0;
       font-size: 14px;
-      margin-top: 12px;
+    }
+
+    .search-feedback.error {
+      color: #ff8f8f;
     }
 
     #results {
-      margin-top: 24px;
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .result-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .result-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .result-title {
+      margin: 0;
+      font-size: 20px;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .pill {
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: #d7e1f2;
+      white-space: nowrap;
+    }
+
+    .result-sub {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .meta-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .meta-value {
+      color: #edf3ff;
+      font-size: 13px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      font-size: 12px;
+      color: #d8e1f4;
+      background: rgba(64,88,255,0.12);
+      border: 1px solid rgba(64,88,255,0.32);
+      border-radius: 999px;
+      padding: 4px 10px;
+      text-decoration: none;
+    }
+
+    .result-description {
+      margin: 10px 0 0;
+      color: #cad3df;
+      line-height: 1.55;
+      font-size: 14px;
     }
 
     @media (max-width: 900px) {
       .search-top h1 {
-        font-size: 38px;
+        font-size: 36px;
       }
 
       .search-row {
@@ -110,6 +230,10 @@
 
       .search-btn {
         width: 100%;
+      }
+
+      .meta-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
   </style>
@@ -146,9 +270,10 @@
     <!-- Main -->
     <main class="search-page">
       <div class="search-top">
+        <span class="eyebrow">Shop Intelligence</span>
         <h1>Search Store Data</h1>
         <p>
-          Enter a Shopify store domain to look up the related store information.
+          Search by domain, Shopify domain, or store title to discover a shop profile with links and core metadata.
         </p>
       </div>
 
@@ -158,17 +283,18 @@
             id="searchInput"
             class="search-input"
             type="text"
-            placeholder="Enter store domain"
+            placeholder="Try: allbirds.com or allbirds.myshopify.com or store title"
             autocomplete="off"
           />
           <button id="searchBtn" class="search-btn" type="button">Search</button>
         </div>
 
         <div class="search-note">
-          Example: store.myshopify.com or https://store.com
+          Supports domain, full URL, and partial store title.
         </div>
       </div>
 
+      <div id="feedback" class="search-feedback"></div>
       <div id="results"></div>
     </main>
 
