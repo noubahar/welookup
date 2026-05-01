@@ -264,9 +264,9 @@ async function searchRankedSubstringCandidates(env, query) {
 
   const [domainDotRes, shopifySlugRes, hyphenDotRes, domRes, slugRes, platRes] = await Promise.all([
     env.DB.prepare(
-      `SELECT DISTINCT shop_id AS id FROM shop_domains
+      `SELECT shop_id AS id FROM shop_domains
        WHERE lower(domain) LIKE ? ESCAPE '\\'
-       LIMIT 300`
+       LIMIT 1200`
     )
       .bind(domainKindDotPat)
       .all(),
@@ -322,18 +322,25 @@ async function searchRankedSubstringCandidates(env, query) {
   for (const r of slugRes.results || []) pushId(r.id);
   for (const r of platRes.results || []) pushId(r.id);
 
-  const idList = ids.slice(0, 640);
+  const idList = ids.slice(0, 900);
   if (!idList.length) return [];
 
   const chunkSize = 80;
-  const rows = [];
+  const chunks = [];
   for (let i = 0; i < idList.length; i += chunkSize) {
-    const chunk = idList.slice(i, i + chunkSize);
-    const ph = chunk.map(() => "?").join(",");
-    const stmt = env.DB.prepare(`${SHOP_SELECT} FROM shops s WHERE s.id IN (${ph})`);
-    const load = await stmt.bind(...chunk).all();
-    rows.push(...(load.results || []));
+    chunks.push(idList.slice(i, i + chunkSize));
   }
+
+  const loads = await Promise.all(
+    chunks.map((chunk) => {
+      const ph = chunk.map(() => "?").join(",");
+      return env.DB.prepare(`${SHOP_SELECT} FROM shops s WHERE s.id IN (${ph})`)
+        .bind(...chunk)
+        .all();
+    })
+  );
+
+  const rows = loads.flatMap((load) => load.results || []);
   return rankShopRowsForNeedle(rows, needle).slice(0, MAX_RESULTS);
 }
 
