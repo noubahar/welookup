@@ -491,6 +491,7 @@ export async function onRequestGet(context) {
   const query = normalizeQuery(rawQuery);
   const rawPage = Number.parseInt(url.searchParams.get("page") || "1", 10);
   const rawLimit = Number.parseInt(url.searchParams.get("limit") || String(DEFAULT_LIMIT), 10);
+  const includeDetails = url.searchParams.get("details") === "1";
   const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
   const safePage = Math.min(page, MAX_PAGE);
   const limit = Number.isFinite(rawLimit)
@@ -516,12 +517,6 @@ export async function onRequestGet(context) {
     ]);
     let results = mergeShopRows([exactD, exactP], resultCap);
 
-    // Before prefix "kind%" domain scans (which flood generic hits), surface storefront / slug matches.
-    if (results.length < resultCap && query.length >= 3) {
-      const rankedSubs = await searchRankedSubstringCandidates(env, query, resultCap);
-      results = appendDedup(results, rankedSubs, resultCap);
-    }
-
     if (results.length === 0) {
       const [likeD, likeP] = await Promise.all([
         searchLikeDomain(env, query),
@@ -530,17 +525,7 @@ export async function onRequestGet(context) {
       results = mergeShopRows([likeD, likeP], resultCap);
     }
 
-    // Haystack / tokens before last-resort unconstrained domain rows.
-    if (results.length < resultCap && query.length >= 3) {
-      const hay = await searchContainsHaystack(env, query);
-      results = appendDedup(results, hay, resultCap);
-    }
-
-    if (results.length < resultCap && tokens.length) {
-      const tokenHits = await searchHaystackTokensAnd(env, tokens);
-      results = appendDedup(results, tokenHits, resultCap);
-    }
-
+    // Speed-first baseline: prioritize cheap indexed/prefix paths, then light fallbacks.
     if (results.length < resultCap) {
       const titleHits = await searchTitle(env, query);
       results = appendDedup(results, titleHits, resultCap);
@@ -555,9 +540,19 @@ export async function onRequestGet(context) {
       results = appendDedup(results, containP, resultCap);
     }
 
+    if (results.length < resultCap && query.length >= 4) {
+      const hay = await searchContainsHaystack(env, query);
+      results = appendDedup(results, hay, resultCap);
+    }
+
+    if (results.length < resultCap && tokens.length && query.length >= 4) {
+      const tokenHits = await searchHaystackTokensAnd(env, tokens);
+      results = appendDedup(results, tokenHits, resultCap);
+    }
+
     if (results.length < resultCap) {
       const broadNeedle = `${rawQuery} ${query}`;
-      if (normalizeBroad(broadNeedle).length >= 4) {
+      if (normalizeBroad(broadNeedle).length >= 6) {
         const broad = await searchBroadNormalizedHaystack(env, broadNeedle);
         results = appendDedup(results, broad, resultCap);
       }
@@ -568,14 +563,16 @@ export async function onRequestGet(context) {
     const paged = deduped.slice(offset, offset + limit);
     const hasMore = offset + limit < deduped.length && safePage < MAX_PAGE;
 
-    const ids = paged.map((r) => r.id);
-    const extras = await enrichByShopIds(env, ids);
-
-    const payload = paged.map((r) => ({
-      ...r,
-      domains: extras[r.id]?.domains || [],
-      links: extras[r.id]?.links || [],
-    }));
+    let payload = paged;
+    if (includeDetails) {
+      const ids = paged.map((r) => r.id);
+      const extras = await enrichByShopIds(env, ids);
+      payload = paged.map((r) => ({
+        ...r,
+        domains: extras[r.id]?.domains || [],
+        links: extras[r.id]?.links || [],
+      }));
+    }
 
     return json({
       query: rawQuery,

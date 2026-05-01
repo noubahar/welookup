@@ -218,7 +218,7 @@ async function fetchSearchPage(targetPage = 1, append = false) {
     for (const baseUrl of endpoints) {
       try {
         const response = await fetchWithTimeout(
-          `${baseUrl}?q=${encodeURIComponent(query)}&page=${state.page}&limit=${state.limit}`,
+          `${baseUrl}?q=${encodeURIComponent(query)}&page=${state.page}&limit=${state.limit}&details=0`,
           REQUEST_TIMEOUT_MS
         );
         if (!response.ok) {
