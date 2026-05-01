@@ -85,7 +85,11 @@ function json(data, status = 200) {
   });
 }
 
-const MAX_RESULTS = 24;
+/** Final JSON cap (large substring queries can match many shops; keep bounded for payload/DB). */
+const MAX_RESULTS = 100;
+
+/** Ranked substring pass returns this many best rows so we do not drop good hits before merge. */
+const RANKED_SUBSTRING_RETURN_CAP = 200;
 
 /** Escape `%` and `_` for SQL LIKE (bind with ESCAPE '\\'). */
 function likeFragment(raw) {
@@ -242,6 +246,9 @@ function rankShopRowsForNeedle(rows, needleLower) {
   return [...rows].sort((a, b) => {
     const d = score(a) - score(b);
     if (d !== 0) return d;
+    const la = String(a.platform_domain || "").length;
+    const lb = String(b.platform_domain || "").length;
+    if (la !== lb) return la - lb;
     return String(a.title || "").length - String(b.title || "").length;
   });
 }
@@ -265,7 +272,7 @@ async function searchRankedSubstringCandidates(env, query) {
     env.DB.prepare(
       `SELECT shop_id AS id FROM shop_domains
        WHERE instr(lower(domain), ?) > 0
-       LIMIT 1200`
+       LIMIT 5000`
     )
       .bind(domainKindDotLiteral)
       .all(),
@@ -321,7 +328,7 @@ async function searchRankedSubstringCandidates(env, query) {
   for (const r of slugRes.results || []) pushId(r.id);
   for (const r of platRes.results || []) pushId(r.id);
 
-  const idList = ids.slice(0, 900);
+  const idList = ids.slice(0, 1200);
   if (!idList.length) return [];
 
   const chunkSize = 80;
@@ -340,7 +347,7 @@ async function searchRankedSubstringCandidates(env, query) {
   );
 
   const rows = loads.flatMap((load) => load.results || []);
-  return rankShopRowsForNeedle(rows, needle).slice(0, MAX_RESULTS);
+  return rankShopRowsForNeedle(rows, needle).slice(0, RANKED_SUBSTRING_RETURN_CAP);
 }
 
 async function searchContainsHaystack(env, query) {
@@ -415,8 +422,8 @@ async function enrichByShopIds(env, shopIds) {
   if (!shopIds.length) return {};
 
   const placeholders = shopIds.map(() => "?").join(",");
-  const perShopDomainCap = 16;
-  const perShopLinkCap = 12;
+  const perShopDomainCap = 20;
+  const perShopLinkCap = 14;
   const domainLimit = shopIds.length * perShopDomainCap;
   const linksLimit = shopIds.length * perShopLinkCap;
 
