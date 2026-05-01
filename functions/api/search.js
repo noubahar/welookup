@@ -85,7 +85,7 @@ function json(data, status = 200) {
   });
 }
 
-/** Final in-memory candidate cap before paging. */
+/** Hard ceiling to protect API/database under very broad queries. */
 const MAX_RESULTS = 100;
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 25;
@@ -259,10 +259,14 @@ function rankShopRowsForNeedle(rows, needleLower) {
  * Short substring queries: cap domain/platform fan-out, load those shops only, then rank in JS.
  * Avoids global ORDER BY over millions of haystack LIKE rows (very slow on D1).
  */
-async function searchRankedSubstringCandidates(env, query) {
+async function searchRankedSubstringCandidates(env, query, resultCap) {
   const frag = likeFragment(query);
   const needle = query.toLowerCase();
   if (needle.length < 2) return [];
+  const domainDotLimit = Math.min(5000, Math.max(300, resultCap * 20));
+  const narrowLimit = Math.max(80, resultCap * 3);
+  const broadLimit = Math.max(120, resultCap * 4);
+  const idPoolLimit = Math.max(400, resultCap * 12);
 
   const hyphenPat = `%-${frag}%`;
   const shopifySlugPat = `%-${frag}.myshopify.com`;
@@ -274,42 +278,42 @@ async function searchRankedSubstringCandidates(env, query) {
     env.DB.prepare(
       `SELECT shop_id AS id FROM shop_domains
        WHERE instr(lower(domain), ?) > 0
-       LIMIT 5000`
+       LIMIT ${domainDotLimit}`
     )
       .bind(domainKindDotLiteral)
       .all(),
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       LIMIT 120`
+       LIMIT ${narrowLimit}`
     )
       .bind(shopifySlugPat)
       .all(),
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       LIMIT 120`
+       LIMIT ${narrowLimit}`
     )
       .bind(hyphenDotPat)
       .all(),
     env.DB.prepare(
       `SELECT DISTINCT shop_id AS id FROM shop_domains
        WHERE lower(domain) LIKE ? ESCAPE '\\'
-       LIMIT 200`
+       LIMIT ${broadLimit}`
     )
       .bind(`%${frag}%`)
       .all(),
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       LIMIT 120`
+       LIMIT ${broadLimit}`
     )
       .bind(hyphenPat)
       .all(),
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       LIMIT 120`
+       LIMIT ${broadLimit}`
     )
       .bind(`%${frag}%`)
       .all(),
@@ -330,7 +334,7 @@ async function searchRankedSubstringCandidates(env, query) {
   for (const r of slugRes.results || []) pushId(r.id);
   for (const r of platRes.results || []) pushId(r.id);
 
-  const idList = ids.slice(0, 1200);
+  const idList = ids.slice(0, idPoolLimit);
   if (!idList.length) return [];
 
   const chunkSize = 80;
@@ -349,7 +353,8 @@ async function searchRankedSubstringCandidates(env, query) {
   );
 
   const rows = loads.flatMap((load) => load.results || []);
-  return rankShopRowsForNeedle(rows, needle).slice(0, RANKED_SUBSTRING_RETURN_CAP);
+  const rankedCap = Math.min(RANKED_SUBSTRING_RETURN_CAP, Math.max(resultCap * 3, 30));
+  return rankShopRowsForNeedle(rows, needle).slice(0, rankedCap);
 }
 
 async function searchContainsHaystack(env, query) {
@@ -488,6 +493,8 @@ export async function onRequestGet(context) {
   const limit = Number.isFinite(rawLimit)
     ? Math.max(1, Math.min(MAX_LIMIT, rawLimit))
     : DEFAULT_LIMIT;
+  // Compute only what this page needs (+small buffer), instead of filling full MAX_RESULTS each time.
+  const resultCap = Math.min(MAX_RESULTS, page * limit + limit * 2);
 
   if (!query) {
     return json({ query: rawQuery, normalizedQuery: query, results: [] });
@@ -504,12 +511,12 @@ export async function onRequestGet(context) {
       searchExactDomain(env, query),
       searchExactPlatformDomain(env, query),
     ]);
-    let results = mergeShopRows([exactD, exactP], MAX_RESULTS);
+    let results = mergeShopRows([exactD, exactP], resultCap);
 
     // Before prefix "kind%" domain scans (which flood generic hits), surface storefront / slug matches.
-    if (results.length < MAX_RESULTS && query.length >= 3) {
-      const rankedSubs = await searchRankedSubstringCandidates(env, query);
-      results = appendDedup(results, rankedSubs, MAX_RESULTS);
+    if (results.length < resultCap && query.length >= 3) {
+      const rankedSubs = await searchRankedSubstringCandidates(env, query, resultCap);
+      results = appendDedup(results, rankedSubs, resultCap);
     }
 
     if (results.length === 0) {
@@ -517,43 +524,43 @@ export async function onRequestGet(context) {
         searchLikeDomain(env, query),
         searchLikePlatformDomain(env, query),
       ]);
-      results = mergeShopRows([likeD, likeP], MAX_RESULTS);
+      results = mergeShopRows([likeD, likeP], resultCap);
     }
 
     // Haystack / tokens before last-resort unconstrained domain rows.
-    if (results.length < MAX_RESULTS && query.length >= 3) {
+    if (results.length < resultCap && query.length >= 3) {
       const hay = await searchContainsHaystack(env, query);
-      results = appendDedup(results, hay, MAX_RESULTS);
+      results = appendDedup(results, hay, resultCap);
     }
 
-    if (results.length < MAX_RESULTS && tokens.length) {
+    if (results.length < resultCap && tokens.length) {
       const tokenHits = await searchHaystackTokensAnd(env, tokens);
-      results = appendDedup(results, tokenHits, MAX_RESULTS);
+      results = appendDedup(results, tokenHits, resultCap);
     }
 
-    if (results.length < MAX_RESULTS) {
+    if (results.length < resultCap) {
       const titleHits = await searchTitle(env, query);
-      results = appendDedup(results, titleHits, MAX_RESULTS);
+      results = appendDedup(results, titleHits, resultCap);
     }
 
-    if (results.length < MAX_RESULTS && query.length >= 3) {
+    if (results.length < resultCap && query.length >= 3) {
       const [containD, containP] = await Promise.all([
         searchContainsDomain(env, query),
         searchContainsPlatformDomain(env, query),
       ]);
-      results = appendDedup(results, containD, MAX_RESULTS);
-      results = appendDedup(results, containP, MAX_RESULTS);
+      results = appendDedup(results, containD, resultCap);
+      results = appendDedup(results, containP, resultCap);
     }
 
-    if (results.length < MAX_RESULTS) {
+    if (results.length < resultCap) {
       const broadNeedle = `${rawQuery} ${query}`;
       if (normalizeBroad(broadNeedle).length >= 4) {
         const broad = await searchBroadNormalizedHaystack(env, broadNeedle);
-        results = appendDedup(results, broad, MAX_RESULTS);
+        results = appendDedup(results, broad, resultCap);
       }
     }
 
-    const deduped = results.slice(0, MAX_RESULTS);
+    const deduped = results.slice(0, resultCap);
     const offset = (page - 1) * limit;
     const paged = deduped.slice(offset, offset + limit);
     const hasMore = offset + limit < deduped.length;
