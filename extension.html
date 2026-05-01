@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WeLookup — Extension</title>
+
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(64,88,255,0.06), transparent),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+      padding: 48px 16px;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.35);
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+    }
+
+    .status .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2ecc71;
+      box-shadow: 0 0 6px rgba(46,204,113,0.16);
+    }
+
+    h1 {
+      font-size: 56px;
+      line-height: 1.02;
+      margin: 10px 0;
+      font-weight: 800;
+    }
+
+    h1 .accent {
+      display: block;
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    p.lead {
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    .install-btn {
+      background-color: rgb(64, 88, 255);
+      color: white;
+      border-radius: 15px;
+      padding: 14px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: background-color 0.3s;
+      margin-top: 30px;
+    }
+
+    .install-btn:hover {
+      background-color: rgb(50, 70, 200);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 36px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.02);
+      border-radius: 14px;
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,0.03);
+      min-height: 140px;
+    }
+
+    .card h3 {
+      margin: 8px 0;
+      font-size: 18px;
+    }
+
+    .card p {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    @media (max-width: 900px) {
+      h1 { font-size: 42px; }
+      .features { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <div class="brand"
+           onclick="location.href='/'"
+           style="cursor:pointer; display:flex; align-items:center; gap:12px;">
+        <img src="welookuplogo.png" alt="WeLookup Logo" style="width:32px; height:auto;" />
+        <div>
+          <div class="brand-title">WeLookup</div>
+          <div class="brand-sub">Instant Store Analysis</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="/extension.html">Extension</a>
+        <a href="https://welookup.substack.com/">Articles</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+      </nav>
+    </header>
+
+    <main class="hero">
+      <div>
+        <div class="status">
+          <span class="dot"></span>
+          <span>Real-Time Store Insights</span>
+        </div>
+
+        <h1>
+          Store Insights at Your Fingertips
+          <span class="accent">Perfect for Shopify Stores</span>
+        </h1>
+
+        <p class="lead">
+          Analyze any store with a click and uncover the tools behind it.
+          Just paste your URL to get started.
+        </p>
+
+        <button class="install-btn"
+          onclick="window.open('https://chromewebstore.google.com/detail/welookup/beocpennmliolhmgdiiacnkdpdpbcpmk?hl=en-US&utm_source=website','_blank')">
+          Install Free Chrome Extension
+        </button>
+      </div>
+    </main>
+
+    <div class="features">
+      <div class="card">
+        <div style="font-size:32px">🛰</div>
+        <h3>Store Performance Overview</h3>
+        <p>Instantly see how your store is performing with key metrics.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:32px">🩻</div>
+        <h3>Identify Installed Tools</h3>
+        <p>Discover apps and tools installed on any ecommerce store.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:32px">🪼</div>
+        <h3>Explore Store Insights</h3>
+        <p>Get immediate visibility into the technology behind stores.</p>
+      </div>
+    </div>
+
+    <footer>
+      <div>
+        <a class="email" href="mailto:support@welookup.info">support@welookup.info</a>
+      </div>
+      <div class="small-note">Free analysis • No store admin access needed</div>
+      <div class="small-note">© 2025 WeLookup</div>
+    </footer>
+  </div>
+</body>
+</html>
