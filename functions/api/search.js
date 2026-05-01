@@ -266,7 +266,6 @@ async function searchRankedSubstringCandidates(env, query) {
     env.DB.prepare(
       `SELECT DISTINCT shop_id AS id FROM shop_domains
        WHERE lower(domain) LIKE ? ESCAPE '\\'
-       ORDER BY length(domain) ASC
        LIMIT 300`
     )
       .bind(domainKindDotPat)
@@ -281,8 +280,7 @@ async function searchRankedSubstringCandidates(env, query) {
     env.DB.prepare(
       `SELECT id FROM shops
        WHERE lower(coalesce(platform_domain,'')) LIKE ? ESCAPE '\\'
-       ORDER BY length(coalesce(platform_domain,'')) ASC
-       LIMIT 100`
+       LIMIT 120`
     )
       .bind(hyphenDotPat)
       .all(),
