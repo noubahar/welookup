@@ -4,9 +4,7 @@ const elements = {
   results: document.getElementById("results"),
   feedback: document.getElementById("feedback"),
   controls: document.getElementById("resultsControls"),
-  prevPageBtn: document.getElementById("prevPageBtn"),
-  nextPageBtn: document.getElementById("nextPageBtn"),
-  pageInfo: document.getElementById("pageInfo"),
+  loadMoreBtn: document.getElementById("loadMoreBtn"),
 };
 
 const DEFAULT_SEARCH_ENDPOINTS = [
@@ -15,7 +13,8 @@ const DEFAULT_SEARCH_ENDPOINTS = [
 ];
 /** D1 search can take several seconds (cold start + parallel queries); keep above typical latency. */
 const REQUEST_TIMEOUT_MS = 45000;
-const DEFAULT_LIMIT = 10;
+const DEFAULT_LIMIT = 5;
+const MAX_PAGES = 10;
 let preferredEndpoint = "";
 const state = {
   query: "",
@@ -24,6 +23,7 @@ const state = {
   limit: DEFAULT_LIMIT,
   hasMore: false,
   loading: false,
+  loadedCount: 0,
 };
 
 function escapeHtml(value) {
@@ -160,8 +160,10 @@ function buildCardHtml(shop) {
   `;
 }
 
-async function progressiveRenderResults(items) {
-  elements.results.innerHTML = "";
+async function progressiveRenderResults(items, append = false) {
+  if (!append) {
+    elements.results.innerHTML = "";
+  }
   for (let i = 0; i < items.length; i += 1) {
     elements.results.insertAdjacentHTML("beforeend", buildCardHtml(items[i]));
     if (i < 3) {
@@ -174,14 +176,13 @@ async function progressiveRenderResults(items) {
 }
 
 function updateControls() {
-  const hasResults = elements.results.children.length > 0;
+  const hasResults = state.loadedCount > 0;
   elements.controls.style.display = hasResults ? "flex" : "none";
-  elements.prevPageBtn.disabled = state.loading || state.page <= 1;
-  elements.nextPageBtn.disabled = state.loading || !state.hasMore;
-  elements.pageInfo.textContent = `Page ${state.page}`;
+  elements.loadMoreBtn.disabled = state.loading || !state.hasMore || state.page >= MAX_PAGES;
+  elements.loadMoreBtn.textContent = state.loading ? "Loading..." : "More";
 }
 
-async function runSearch(targetPage = 1) {
+async function fetchSearchPage(targetPage = 1, append = false) {
   const query = normalizeQuery(elements.input.value);
   if (!query) {
     elements.results.innerHTML = "";
@@ -197,12 +198,17 @@ async function runSearch(targetPage = 1) {
     return;
   }
 
+  if (targetPage > MAX_PAGES) return;
+
   state.query = query;
   state.page = targetPage;
   state.loading = true;
-  elements.button.disabled = true;
+  if (!append) {
+    elements.button.disabled = true;
+    state.loadedCount = 0;
+  }
   updateControls();
-  setFeedback(`Searching page ${state.page}...`, false);
+  setFeedback(append ? "Loading more..." : "Searching...", false);
 
   try {
     let payload = null;
@@ -237,21 +243,30 @@ async function runSearch(targetPage = 1) {
 
     const results = payload.results || [];
     if (!results.length) {
-      elements.results.innerHTML = "";
-      elements.controls.style.display = "none";
+      if (!append) {
+        elements.results.innerHTML = "";
+        elements.controls.style.display = "none";
+      }
       setFeedback(`No matching shop found for "${query}". Try another domain or store title.`);
       return;
     }
 
+    await progressiveRenderResults(results, append);
+    state.loadedCount = elements.results.children.length;
+    const moreHint =
+      state.hasMore && state.page < MAX_PAGES
+        ? ` Click "More" to load next ${state.limit}.`
+        : " End of available results.";
     setFeedback(
-      `Showing ${results.length} result${results.length > 1 ? "s" : ""} on page ${state.page} for "${state.normalizedQuery}".`,
+      `Loaded ${state.loadedCount} result${state.loadedCount > 1 ? "s" : ""} for "${state.normalizedQuery}".${moreHint}`,
       false
     );
-    await progressiveRenderResults(results);
     updateControls();
   } catch (error) {
-    elements.results.innerHTML = "";
-    elements.controls.style.display = "none";
+    if (!append) {
+      elements.results.innerHTML = "";
+      elements.controls.style.display = "none";
+    }
     const timedOut = error && error.name === "AbortError";
     setFeedback(
       timedOut
@@ -267,15 +282,21 @@ async function runSearch(targetPage = 1) {
   }
 }
 
-elements.button.addEventListener("click", () => runSearch(1));
+async function runSearchFromStart() {
+  elements.results.innerHTML = "";
+  state.page = 1;
+  state.hasMore = false;
+  await fetchSearchPage(1, false);
+}
+
+elements.button.addEventListener("click", runSearchFromStart);
 elements.input.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") runSearch(1);
+  if (event.key === "Enter") runSearchFromStart();
 });
-elements.prevPageBtn.addEventListener("click", () => {
-  if (state.page > 1 && !state.loading) runSearch(state.page - 1);
-});
-elements.nextPageBtn.addEventListener("click", () => {
-  if (state.hasMore && !state.loading) runSearch(state.page + 1);
+elements.loadMoreBtn.addEventListener("click", async () => {
+  if (!state.loading && state.hasMore && state.page < MAX_PAGES) {
+    await fetchSearchPage(state.page + 1, true);
+  }
 });
 
 setFeedback("Enter a query to start exploring Shopify store data.");

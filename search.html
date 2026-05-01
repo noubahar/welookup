@@ -59,6 +59,19 @@
       padding: 18px;
       margin-top: 22px;
       box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    .search-version {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      font-size: 11px;
+      color: #aebad1;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.03);
     }
 
     .search-row {
@@ -150,13 +163,6 @@
     .pager-btn:disabled {
       opacity: 0.45;
       cursor: not-allowed;
-    }
-
-    .pager-info {
-      font-size: 13px;
-      color: var(--muted);
-      min-width: 130px;
-      text-align: center;
     }
 
     .result-card {
@@ -309,6 +315,7 @@
       </div>
 
       <div class="search-box">
+        <div class="search-version">v2026.05.01-r2</div>
         <div class="search-row">
           <input
             id="searchInput"
@@ -328,9 +335,7 @@
       <div id="feedback" class="search-feedback"></div>
       <div id="results"></div>
       <div id="resultsControls" class="results-controls" style="display:none;">
-        <button id="prevPageBtn" class="pager-btn" type="button">Previous</button>
-        <span id="pageInfo" class="pager-info">Page 1</span>
-        <button id="nextPageBtn" class="pager-btn" type="button">Next</button>
+        <button id="loadMoreBtn" class="pager-btn" type="button">More</button>
       </div>
     </main>
 

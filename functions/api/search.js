@@ -87,8 +87,10 @@ function json(data, status = 200) {
 
 /** Hard ceiling to protect API/database under very broad queries. */
 const MAX_RESULTS = 100;
-const DEFAULT_LIMIT = 10;
-const MAX_LIMIT = 25;
+const DEFAULT_LIMIT = 5;
+const MAX_LIMIT = 5;
+const MAX_PAGE = 10;
+const MAX_VISIBLE_RESULTS = 50;
 
 /** Ranked substring pass returns this many best rows so we do not drop good hits before merge. */
 const RANKED_SUBSTRING_RETURN_CAP = 200;
@@ -263,10 +265,10 @@ async function searchRankedSubstringCandidates(env, query, resultCap) {
   const frag = likeFragment(query);
   const needle = query.toLowerCase();
   if (needle.length < 2) return [];
-  const domainDotLimit = Math.min(5000, Math.max(300, resultCap * 20));
-  const narrowLimit = Math.max(80, resultCap * 3);
-  const broadLimit = Math.max(120, resultCap * 4);
-  const idPoolLimit = Math.max(400, resultCap * 12);
+  const domainDotLimit = Math.min(1500, Math.max(80, resultCap * 8));
+  const narrowLimit = Math.max(30, resultCap * 2);
+  const broadLimit = Math.max(40, resultCap * 3);
+  const idPoolLimit = Math.max(120, resultCap * 8);
 
   const hyphenPat = `%-${frag}%`;
   const shopifySlugPat = `%-${frag}.myshopify.com`;
@@ -490,11 +492,12 @@ export async function onRequestGet(context) {
   const rawPage = Number.parseInt(url.searchParams.get("page") || "1", 10);
   const rawLimit = Number.parseInt(url.searchParams.get("limit") || String(DEFAULT_LIMIT), 10);
   const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+  const safePage = Math.min(page, MAX_PAGE);
   const limit = Number.isFinite(rawLimit)
     ? Math.max(1, Math.min(MAX_LIMIT, rawLimit))
     : DEFAULT_LIMIT;
   // Compute only what this page needs (+small buffer), instead of filling full MAX_RESULTS each time.
-  const resultCap = Math.min(MAX_RESULTS, page * limit + limit * 2);
+  const resultCap = Math.min(MAX_RESULTS, MAX_VISIBLE_RESULTS, safePage * limit + limit * 2);
 
   if (!query) {
     return json({ query: rawQuery, normalizedQuery: query, results: [] });
@@ -561,9 +564,9 @@ export async function onRequestGet(context) {
     }
 
     const deduped = results.slice(0, resultCap);
-    const offset = (page - 1) * limit;
+    const offset = (safePage - 1) * limit;
     const paged = deduped.slice(offset, offset + limit);
-    const hasMore = offset + limit < deduped.length;
+    const hasMore = offset + limit < deduped.length && safePage < MAX_PAGE;
 
     const ids = paged.map((r) => r.id);
     const extras = await enrichByShopIds(env, ids);
@@ -577,7 +580,7 @@ export async function onRequestGet(context) {
     return json({
       query: rawQuery,
       normalizedQuery: query,
-      page,
+      page: safePage,
       limit,
       has_more: hasMore,
       total_available: deduped.length,
