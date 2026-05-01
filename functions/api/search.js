@@ -130,6 +130,19 @@ function appendDedup(base, extraRows, cap) {
   return out;
 }
 
+function detectQueryIntent(rawQuery, normalizedQuery) {
+  const raw = String(rawQuery || "").trim().toLowerCase();
+  const q = String(normalizedQuery || "").trim().toLowerCase();
+  const hasProtocol = raw.startsWith("http://") || raw.startsWith("https://");
+  const hasWww = raw.startsWith("www.");
+  const domainLike = /^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/i.test(q);
+  const isShopifyDomain = q.endsWith(".myshopify.com");
+
+  if (isShopifyDomain) return "shopify_domain";
+  if (hasProtocol || hasWww || domainLike) return "domain_like";
+  return "keyword";
+}
+
 const SHOP_SELECT = `SELECT
       s.id,
       s.title,
@@ -508,53 +521,83 @@ export async function onRequestGet(context) {
   }
 
   try {
+    const intent = detectQueryIntent(rawQuery, query);
     const tokens = extractSearchTokens(rawQuery, query);
 
-    // Fast path: exact host only (2 queries), skip scans when we already know the shop.
-    const [exactD, exactP] = await Promise.all([
-      searchExactDomain(env, query),
-      searchExactPlatformDomain(env, query),
-    ]);
-    let results = mergeShopRows([exactD, exactP], resultCap);
-
-    if (results.length === 0) {
-      const [likeD, likeP] = await Promise.all([
-        searchLikeDomain(env, query),
-        searchLikePlatformDomain(env, query),
+    let results = [];
+    if (intent === "shopify_domain") {
+      const [exactP, exactD] = await Promise.all([
+        searchExactPlatformDomain(env, query),
+        searchExactDomain(env, query),
       ]);
-      results = mergeShopRows([likeD, likeP], resultCap);
-    }
-
-    // Speed-first baseline: prioritize cheap indexed/prefix paths, then light fallbacks.
-    if (results.length < resultCap) {
+      results = mergeShopRows([exactP, exactD], resultCap);
+      if (results.length < resultCap) {
+        const [likeP, likeD] = await Promise.all([
+          searchLikePlatformDomain(env, query),
+          searchLikeDomain(env, query),
+        ]);
+        results = appendDedup(results, likeP, resultCap);
+        results = appendDedup(results, likeD, resultCap);
+      }
+      if (results.length < resultCap && query.length >= 3) {
+        const [containP, containD] = await Promise.all([
+          searchContainsPlatformDomain(env, query),
+          searchContainsDomain(env, query),
+        ]);
+        results = appendDedup(results, containP, resultCap);
+        results = appendDedup(results, containD, resultCap);
+      }
+    } else if (intent === "domain_like") {
+      const [exactD, exactP] = await Promise.all([
+        searchExactDomain(env, query),
+        searchExactPlatformDomain(env, query),
+      ]);
+      results = mergeShopRows([exactD, exactP], resultCap);
+      if (results.length < resultCap) {
+        const [likeD, likeP] = await Promise.all([
+          searchLikeDomain(env, query),
+          searchLikePlatformDomain(env, query),
+        ]);
+        results = appendDedup(results, likeD, resultCap);
+        results = appendDedup(results, likeP, resultCap);
+      }
+      if (results.length < resultCap && query.length >= 3) {
+        const [containD, containP] = await Promise.all([
+          searchContainsDomain(env, query),
+          searchContainsPlatformDomain(env, query),
+        ]);
+        results = appendDedup(results, containD, resultCap);
+        results = appendDedup(results, containP, resultCap);
+      }
+      if (results.length < resultCap) {
+        const titleHits = await searchTitle(env, query);
+        results = appendDedup(results, titleHits, resultCap);
+      }
+    } else {
       const titleHits = await searchTitle(env, query);
       results = appendDedup(results, titleHits, resultCap);
-    }
-
-    if (results.length < resultCap && query.length >= 3) {
-      const [containD, containP] = await Promise.all([
-        searchContainsDomain(env, query),
-        searchContainsPlatformDomain(env, query),
-      ]);
-      results = appendDedup(results, containD, resultCap);
-      results = appendDedup(results, containP, resultCap);
-    }
-
-    if (results.length < resultCap && query.length >= 4) {
-      const hay = await searchContainsHaystack(env, query);
-      results = appendDedup(results, hay, resultCap);
-    }
-
-    if (results.length < resultCap && tokens.length && query.length >= 4) {
-      const tokenHits = await searchHaystackTokensAnd(env, tokens);
-      results = appendDedup(results, tokenHits, resultCap);
-    }
-
-    if (results.length < resultCap) {
-      const broadNeedle = `${rawQuery} ${query}`;
-      if (normalizeBroad(broadNeedle).length >= 6) {
-        const broad = await searchBroadNormalizedHaystack(env, broadNeedle);
-        results = appendDedup(results, broad, resultCap);
+      if (results.length < resultCap && query.length >= 3) {
+        const [containD, containP] = await Promise.all([
+          searchContainsDomain(env, query),
+          searchContainsPlatformDomain(env, query),
+        ]);
+        results = appendDedup(results, containD, resultCap);
+        results = appendDedup(results, containP, resultCap);
+      }
+      if (results.length < resultCap && query.length >= 4) {
+        const hay = await searchContainsHaystack(env, query);
+        results = appendDedup(results, hay, resultCap);
+      }
+      if (results.length < resultCap && tokens.length && query.length >= 4) {
+        const tokenHits = await searchHaystackTokensAnd(env, tokens);
+        results = appendDedup(results, tokenHits, resultCap);
+      }
+      if (results.length < resultCap) {
+        const broadNeedle = `${rawQuery} ${query}`;
+        if (normalizeBroad(broadNeedle).length >= 6) {
+          const broad = await searchBroadNormalizedHaystack(env, broadNeedle);
+          results = appendDedup(results, broad, resultCap);
+        }
       }
     }
 
@@ -577,6 +620,7 @@ export async function onRequestGet(context) {
     return json({
       query: rawQuery,
       normalizedQuery: query,
+      intent,
       page: safePage,
       limit,
       has_more: hasMore,
