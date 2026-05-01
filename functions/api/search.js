@@ -505,6 +505,7 @@ export async function onRequestGet(context) {
   const rawPage = Number.parseInt(url.searchParams.get("page") || "1", 10);
   const rawLimit = Number.parseInt(url.searchParams.get("limit") || String(DEFAULT_LIMIT), 10);
   const includeDetails = url.searchParams.get("details") === "1";
+  const domainOnly = url.searchParams.get("domain_only") === "1";
   const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
   const safePage = Math.min(page, MAX_PAGE);
   const limit = Number.isFinite(rawLimit)
@@ -525,7 +526,31 @@ export async function onRequestGet(context) {
     const tokens = extractSearchTokens(rawQuery, query);
 
     let results = [];
-    if (intent === "shopify_domain") {
+    if (domainOnly) {
+      const [exactD, exactP] = await Promise.all([
+        searchExactDomain(env, query),
+        searchExactPlatformDomain(env, query),
+      ]);
+      results = mergeShopRows([exactD, exactP], resultCap);
+
+      if (results.length < resultCap) {
+        const [likeD, likeP] = await Promise.all([
+          searchLikeDomain(env, query),
+          searchLikePlatformDomain(env, query),
+        ]);
+        results = appendDedup(results, likeD, resultCap);
+        results = appendDedup(results, likeP, resultCap);
+      }
+
+      if (results.length < resultCap && query.length >= 3) {
+        const [containD, containP] = await Promise.all([
+          searchContainsDomain(env, query),
+          searchContainsPlatformDomain(env, query),
+        ]);
+        results = appendDedup(results, containD, resultCap);
+        results = appendDedup(results, containP, resultCap);
+      }
+    } else if (intent === "shopify_domain") {
       const [exactP, exactD] = await Promise.all([
         searchExactPlatformDomain(env, query),
         searchExactDomain(env, query),
@@ -621,6 +646,7 @@ export async function onRequestGet(context) {
       query: rawQuery,
       normalizedQuery: query,
       intent,
+      domain_only: domainOnly,
       page: safePage,
       limit,
       has_more: hasMore,
