@@ -85,8 +85,10 @@ function json(data, status = 200) {
   });
 }
 
-/** Final JSON cap (large substring queries can match many shops; keep bounded for payload/DB). */
+/** Final in-memory candidate cap before paging. */
 const MAX_RESULTS = 100;
+const DEFAULT_LIMIT = 10;
+const MAX_LIMIT = 25;
 
 /** Ranked substring pass returns this many best rows so we do not drop good hits before merge. */
 const RANKED_SUBSTRING_RETURN_CAP = 200;
@@ -480,6 +482,12 @@ export async function onRequestGet(context) {
   const url = new URL(request.url);
   const rawQuery = url.searchParams.get("q") || "";
   const query = normalizeQuery(rawQuery);
+  const rawPage = Number.parseInt(url.searchParams.get("page") || "1", 10);
+  const rawLimit = Number.parseInt(url.searchParams.get("limit") || String(DEFAULT_LIMIT), 10);
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+  const limit = Number.isFinite(rawLimit)
+    ? Math.max(1, Math.min(MAX_LIMIT, rawLimit))
+    : DEFAULT_LIMIT;
 
   if (!query) {
     return json({ query: rawQuery, normalizedQuery: query, results: [] });
@@ -546,11 +554,14 @@ export async function onRequestGet(context) {
     }
 
     const deduped = results.slice(0, MAX_RESULTS);
+    const offset = (page - 1) * limit;
+    const paged = deduped.slice(offset, offset + limit);
+    const hasMore = offset + limit < deduped.length;
 
-    const ids = deduped.map((r) => r.id);
+    const ids = paged.map((r) => r.id);
     const extras = await enrichByShopIds(env, ids);
 
-    const payload = deduped.map((r) => ({
+    const payload = paged.map((r) => ({
       ...r,
       domains: extras[r.id]?.domains || [],
       links: extras[r.id]?.links || [],
@@ -559,6 +570,10 @@ export async function onRequestGet(context) {
     return json({
       query: rawQuery,
       normalizedQuery: query,
+      page,
+      limit,
+      has_more: hasMore,
+      total_available: deduped.length,
       count: payload.length,
       results: payload,
     });
