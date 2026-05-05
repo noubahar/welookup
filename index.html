@@ -3,145 +3,188 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WeLookup — Real-Time Store Search</title>
+  <title>WeLookup — Extension</title>
+
   <link rel="stylesheet" href="/styles.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
   <style>
     body {
       background:
         radial-gradient(1200px 600px at 10% 10%, rgba(64,88,255,0.06), transparent),
         linear-gradient(180deg, var(--bg1), var(--bg2));
     }
-    .home-page { max-width: 1020px; margin: 0 auto; padding: 22px 16px 60px; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+      padding: 48px 16px;
+      justify-items: center;
+      text-align: center;
+    }
+
     .status {
-      display: inline-flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.35);
-      padding: 8px 14px; border-radius: 999px; color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.35);
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: var(--muted);
     }
-    .status .dot { width: 10px; height: 10px; border-radius: 50%; background: #2ecc71; box-shadow: 0 0 6px rgba(46,204,113,0.16); }
-    .hero { text-align: center; padding: 36px 0 18px; }
-    .hero h1 { font-size: 54px; line-height: 1.03; margin: 10px 0; font-weight: 800; }
-    .hero h1 .accent { display: block; color: var(--accent); }
-    .lead { color: var(--muted); font-size: 18px; max-width: 820px; margin: 0 auto; }
-    .search-box {
-      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.09); border-radius: 18px;
-      padding: 18px; margin-top: 22px; box-shadow: 0 12px 30px rgba(0,0,0,0.15); position: relative;
+
+    .status .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2ecc71;
+      box-shadow: 0 0 6px rgba(46,204,113,0.16);
     }
-    .search-version {
-      position: absolute; right: 12px; top: 10px; font-size: 11px; color: #aebad1;
-      border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; padding: 4px 8px; background: rgba(255,255,255,0.03);
+
+    h1 {
+      font-size: 56px;
+      line-height: 1.02;
+      margin: 10px 0;
+      font-weight: 800;
     }
-    .search-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .search-input {
-      flex: 1; min-width: 260px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
-      color: var(--text); border-radius: 14px; padding: 16px 18px; font-size: 16px; outline: none;
+
+    h1 .accent {
+      display: block;
+      color: var(--accent);
+      font-weight: 800;
     }
-    .search-input:focus { border-color: rgba(64,88,255,0.95); box-shadow: 0 0 0 3px rgba(64,88,255,0.16); }
-    .search-btn {
-      background: linear-gradient(180deg, #4961ff, #3a4ff0); color: white; border-radius: 14px; padding: 16px 24px;
-      font-size: 16px; font-weight: 700; border: none; cursor: pointer;
+
+    p.lead {
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 880px;
+      margin: 0 auto;
     }
-    .search-note { color: var(--muted); font-size: 13px; margin-top: 10px; }
-    .install-wrap { text-align: center; margin-top: 18px; }
+
     .install-btn {
-      background: rgb(64,88,255); color: #fff; border-radius: 14px; padding: 14px 28px; font-size: 16px; font-weight: 700;
-      border: none; cursor: pointer;
+      background-color: rgb(64, 88, 255);
+      color: white;
+      border-radius: 15px;
+      padding: 14px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: background-color 0.3s;
+      margin-top: 30px;
     }
-    .install-btn:hover { background: rgb(50,70,200); }
-    .install-note { margin-top: 10px; color: #c7d2e4; font-size: 14px; line-height: 1.5; }
-    .results-zone {
-      margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 22px;
-      background: linear-gradient(180deg, rgba(64,88,255,0.03), rgba(255,255,255,0.01));
-      border-radius: 14px; padding-left: 12px; padding-right: 12px; padding-bottom: 12px;
+
+    .install-btn:hover {
+      background-color: rgb(50, 70, 200);
     }
-    .search-feedback { margin-top: 10px; color: #d9e2f0; font-size: 14px; }
-    .search-feedback.error { color: #ff8f8f; }
-    #results { margin-top: 16px; display: grid; gap: 14px; }
-    .results-controls { margin-top: 14px; display: flex; justify-content: center; }
-    .pager-btn {
-      background: rgba(255,255,255,0.06); color: #e8efff; border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 10px; padding: 10px 14px; cursor: pointer; font-weight: 600;
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 36px;
     }
-    .pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-    .result-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px; }
-    .result-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
-    .result-title { margin: 0; font-size: 20px; color: #fff; line-height: 1.2; }
-    .pill { border: 1px solid rgba(255,255,255,0.14); border-radius: 999px; padding: 4px 10px; font-size: 12px; color: #d7e1f2; white-space: nowrap; }
-    .result-sub { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
-    .meta-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
-    .meta-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 10px; }
-    .meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px; }
-    .meta-value { color: #edf3ff; font-size: 13px; line-height: 1.4; word-break: break-word; }
-    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .chip { font-size: 12px; color: #d8e1f4; background: rgba(64,88,255,0.12); border: 1px solid rgba(64,88,255,0.32); border-radius: 999px; padding: 4px 10px; text-decoration: none; }
-    .result-description { margin: 10px 0 0; color: #cad3df; line-height: 1.55; font-size: 14px; }
+
+    .card {
+      background: rgba(255,255,255,0.02);
+      border-radius: 14px;
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,0.03);
+      min-height: 140px;
+    }
+
+    .card h3 {
+      margin: 8px 0;
+      font-size: 18px;
+    }
+
+    .card p {
+      color: var(--muted);
+      margin: 0;
+    }
+
     @media (max-width: 900px) {
-      .hero h1 { font-size: 38px; }
-      .search-row { flex-direction: column; align-items: stretch; }
-      .search-btn { width: 100%; }
-      .meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      h1 { font-size: 42px; }
+      .features { grid-template-columns: 1fr; }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <header>
-      <div class="brand" onclick="location.href='/'" style="cursor:pointer; display:flex; align-items:center; gap:12px;">
+      <div class="brand"
+           onclick="location.href='/'"
+           style="cursor:pointer; display:flex; align-items:center; gap:12px;">
         <img src="welookuplogo.png" alt="WeLookup Logo" style="width:32px; height:auto;" />
         <div>
           <div class="brand-title">WeLookup</div>
           <div class="brand-sub">Instant Store Analysis</div>
         </div>
       </div>
+
       <nav class="nav">
+        <a href="/search.html">Search</a>
         <a href="/extension.html">Extension</a>
         <a href="https://welookup.substack.com/">Articles</a>
         <a href="/privacy-policy.html">Privacy Policy</a>
       </nav>
     </header>
 
-    <main class="home-page">
-      <section class="hero">
-        <div class="status"><span class="dot"></span><span>Real-Time Store Insights</span></div>
-        <h1>Store Insights at Your Fingertips <span class="accent">Perfect for Shopify Stores</span></h1>
-        <p class="lead">Analyze any store with a click and uncover the tools behind it. Just paste your URL to get started.</p>
-      </section>
-
-      <section class="search-box">
-        <div class="search-version">v2026.05.01-r2</div>
-        <div class="search-row">
-          <input id="searchInput" class="search-input" type="text" placeholder="Try: allbirds.com or allbirds.myshopify.com or store title" autocomplete="off" />
-          <button id="searchBtn" class="search-btn" type="button">Search</button>
+    <main class="hero">
+      <div>
+        <div class="status">
+          <span class="dot"></span>
+          <span>Real-Time Store Insights</span>
         </div>
-        <div class="search-note">Supports domain, full URL, and partial store title.</div>
-      </section>
 
-      <section class="install-wrap">
+        <h1>
+          Store Insights at Your Fingertips
+          <span class="accent">Perfect for Shopify Stores</span>
+        </h1>
+
+        <p class="lead">
+          Analyze any store with a click and uncover the tools behind it.
+          Just paste your URL to get started.
+        </p>
+
         <button class="install-btn"
           onclick="window.open('https://chromewebstore.google.com/detail/welookup/beocpennmliolhmgdiiacnkdpdpbcpmk?hl=en-US&utm_source=website','_blank')">
-          Download Chrome Extension
+          Install Free Chrome Extension
         </button>
-        <div class="install-note">
-          To unlock each shop's tool stack, install the extension.<br>
-          No sign-up required. Just install and enjoy it for free.
-        </div>
-      </section>
-
-      <section class="results-zone">
-        <div id="feedback" class="search-feedback"></div>
-        <div id="results"></div>
-        <div id="resultsControls" class="results-controls" style="display:none;">
-          <button id="loadMoreBtn" class="pager-btn" type="button">More</button>
-        </div>
-      </section>
+      </div>
     </main>
 
+    <div class="features">
+      <div class="card">
+        <div style="font-size:32px">🛰</div>
+        <h3>Store Performance Overview</h3>
+        <p>Instantly see how your store is performing with key metrics.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:32px">🩻</div>
+        <h3>Identify Installed Tools</h3>
+        <p>Discover apps and tools installed on any ecommerce store.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:32px">🪼</div>
+        <h3>Explore Store Insights</h3>
+        <p>Get immediate visibility into the technology behind stores.</p>
+      </div>
+    </div>
+
     <footer>
-      <div><a class="email" href="mailto:support@welookup.info">support@welookup.info</a></div>
+      <div>
+        <a class="email" href="mailto:support@welookup.info">support@welookup.info</a>
+      </div>
       <div class="small-note">Free analysis • No store admin access needed</div>
       <div class="small-note">© 2025 WeLookup</div>
     </footer>
   </div>
-  <script src="script.js"></script>
 </body>
 </html>
