@@ -83,32 +83,6 @@ header {
   margin-bottom: 36px;
 }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.header-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 800;
-  text-decoration: none;
-  color: #ffffff;
-  background: linear-gradient(180deg, #4961ff, #3a4ff0);
-  border: 1px solid rgba(64,88,255,0.55);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
-  white-space: nowrap;
-}
-
-.header-cta:hover {
-  filter: brightness(1.05);
-}
-
 .brand {
   display: flex;
   align-items: center;
