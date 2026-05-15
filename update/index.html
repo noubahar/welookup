@@ -122,6 +122,7 @@
     .tag.green { background: rgba(46,204,113,0.12); border-color: rgba(46,204,113,0.35); color: #caffdf; }
     .tag.blue { background: rgba(64,88,255,0.13); border-color: rgba(64,88,255,0.40); color: #e3e9ff; }
     .tag.purple { background: rgba(124,91,255,0.13); border-color: rgba(124,91,255,0.40); color: #efeaff; }
+    .tag.gold { background: rgba(245,190,80,0.13); border-color: rgba(245,190,80,0.36); color: #ffe9b0; }
 
     .cta {
       margin-top: 14px;
@@ -175,9 +176,140 @@
       line-height: 1.6;
     }
 
+    .release-card {
+      position: relative;
+      overflow: hidden;
+      grid-column: 1 / -1;
+      padding: 22px;
+      background:
+        linear-gradient(135deg, rgba(64,88,255,0.16), rgba(255,255,255,0.025) 44%),
+        rgba(255,255,255,0.03);
+      border-color: rgba(64,88,255,0.24);
+    }
+
+    .release-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(520px 180px at 85% 0%, rgba(46,204,113,0.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .release-card > * {
+      position: relative;
+    }
+
+    .release-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .release-version {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #cfd8ff;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .release-version .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #2ecc71;
+      box-shadow: 0 0 14px rgba(46,204,113,0.28);
+    }
+
+    .release-top h2 {
+      font-size: 30px;
+      line-height: 1.12;
+      margin: 8px 0 8px;
+      text-transform: none;
+      letter-spacing: -0.02em;
+    }
+
+    .release-top p {
+      color: #cdd6e3;
+      margin: 0;
+      max-width: 680px;
+    }
+
+    .coverage-badge {
+      flex: 0 0 auto;
+      min-width: 150px;
+      border: 1px solid rgba(46,204,113,0.28);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(46,204,113,0.08);
+      text-align: right;
+    }
+
+    .coverage-badge strong {
+      display: block;
+      color: #ffffff;
+      font-size: 26px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .coverage-badge span {
+      color: #caffdf;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .feature-item {
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.025);
+      color: #d7dfec;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .feature-item::before {
+      content: "";
+      flex: 0 0 auto;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 7px;
+      background: #4058ff;
+      box-shadow: 0 0 12px rgba(64,88,255,0.26);
+    }
+
+    .link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
     @media (max-width: 900px) {
       .hero h1 { font-size: 38px; }
       .grid { grid-template-columns: 1fr; }
+      .release-top { display: block; }
+      .coverage-badge { text-align: left; margin-top: 14px; }
+      .feature-list { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -205,27 +337,67 @@
     <main class="page">
       <section class="hero">
         <div class="status"><span class="dot"></span><span>Release notes</span></div>
-        <h1>WeLookup has been updated</h1>
+        <h1>WeLookup 1.0.0 is here</h1>
         <p class="lead">
-          Faster scans, cleaner results, and more power for Shopify-focused research.
+          The first uploaded release with the new Information tab, deeper Shopify context,
+          and expanded app detection coverage.
         </p>
       </section>
 
       <section class="grid">
+        <div class="card release-card">
+          <div class="release-top">
+            <div>
+              <div class="release-version"><span class="dot"></span> Version 1.0.0</div>
+              <h2>A sharper extension for understanding any storefront</h2>
+              <p>
+                The new Information tab turns the current page into a clear store profile:
+                identity, contact signals, Shopify details, products, and visual cues in one place.
+              </p>
+            </div>
+            <div class="coverage-badge">
+              <strong>7,548</strong>
+              <span>apps and tools</span>
+            </div>
+          </div>
+
+          <div class="feature-list">
+            <div class="feature-item">Introduces the new Information tab for website and Shopify store insights.</div>
+            <div class="feature-item">Shows store profile, logo, category, description, social links, email, and phone.</div>
+            <div class="feature-item">Adds Color Palette, Shopify domain display, store signals, and product insights.</div>
+            <div class="feature-item">Adds click-to-copy support for Shopify domains.</div>
+            <div class="feature-item">Improves product price range accuracy using cleaner product pricing logic.</div>
+            <div class="feature-item">Improves Information tab readability in light and dark themes.</div>
+            <div class="feature-item">Expands detection coverage from 7,030 to 7,548 apps and tools.</div>
+            <div class="feature-item">Keeps the extension focused on fast current-page store analysis.</div>
+          </div>
+
+          <div class="link-row">
+            <a class="btn primary" href="/">Back to homepage</a>
+            <a
+              class="btn"
+              href="https://chromewebstore.google.com/detail/welookup-%E2%80%93-app-detector-s/beocpennmliolhmgdiiacnkdpdpbcpmk?hl=en-US&utm_source=website"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Get the extension</a>
+            <a class="btn" href="/search.html">Try beta search</a>
+          </div>
+        </div>
+
         <div class="card">
-          <h2>What’s new</h2>
+          <h2>Release highlights</h2>
           <div class="level">
             <div class="pill">
-              <span class="tag green">Coverage</span>
-              <div class="text"><strong>Now detecting 7,000+ apps & tools</strong> across ecommerce stores.</div>
+              <span class="tag green">Information</span>
+              <div class="text"><strong>Store profiles are clearer</strong> with logo, category, description, contact links, and Shopify context.</div>
             </div>
             <div class="pill">
-              <span class="tag blue">Experience</span>
-              <div class="text"><strong>Fast, simple</strong>, and built for Shopify analysis.</div>
+              <span class="tag blue">Products</span>
+              <div class="text"><strong>Product insights are easier to read</strong>, with more accurate price ranges and average price summaries.</div>
             </div>
             <div class="pill">
-              <span class="tag purple">How to use</span>
-              <div class="text"><strong>Click the extension</strong> on any store and start exploring.</div>
+              <span class="tag purple">Detection</span>
+              <div class="text"><strong>Coverage now reaches 7,548 apps and tools</strong>, up from 7,030.</div>
             </div>
           </div>
 
@@ -238,18 +410,18 @@
             >Get the extension</a>
           </div>
           <div class="note">
-            Tip: search by store domain, Shopify domain, or store title.
+            Tip: open the extension on a storefront and switch to the Information tab.
           </div>
         </div>
 
         <div class="card beta">
           <h2>Shop search <span style="font-size:12px; font-weight:700; color: var(--muted); text-transform:none;">(beta - in progress)</span></h2>
           <p class="mini">
-            We’re working on a <strong>beta</strong> experience that can surface Shopify shop information
-            in one place—so you can go from “this looks interesting” to a deeper shop profile instantly.
+            WeLookup Search is still under development and currently in <strong>beta</strong>.
+            It is experimental and separate from the Chrome extension, which remains the main product.
           </p>
           <p class="mini">
-            In the meantime, you can already explore right now using our search engine.
+            You can try the search surface now while we continue improving the shop profile experience.
           </p>
 
           <div class="cta" style="justify-content:flex-start;">
