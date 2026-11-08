@@ -34,10 +34,36 @@ const answerKicker = document.querySelector("[data-answer-kicker]");
 const answerTitle = document.querySelector("[data-answer-title]");
 const answerCopy = document.querySelector("[data-answer-copy]");
 const answerPlaceholder = document.querySelector("[data-answer-placeholder]");
+const scrollCta = document.querySelector("[data-scroll-cta]");
+const scrollCtaClose = document.querySelector("[data-scroll-cta-close]");
+const scrollCtaDismissedKey = "welookup-landing-v2-scroll-cta-dismissed";
+let scrollCtaDismissed = sessionStorage.getItem(scrollCtaDismissedKey) === "true";
+let scrollCtaShown = false;
 
 function updateHeader() {
   header?.classList.toggle("is-scrolled", window.scrollY > 12);
 }
+
+function updateScrollCta() {
+  if (!scrollCta || scrollCtaDismissed || scrollCtaShown || window.scrollY < 360) return;
+
+  scrollCtaShown = true;
+  scrollCta.hidden = false;
+  requestAnimationFrame(() => scrollCta.classList.add("is-visible"));
+}
+
+function dismissScrollCta() {
+  if (!scrollCta) return;
+
+  scrollCtaDismissed = true;
+  sessionStorage.setItem(scrollCtaDismissedKey, "true");
+  scrollCta.classList.remove("is-visible");
+  window.setTimeout(() => {
+    scrollCta.hidden = true;
+  }, 220);
+}
+
+scrollCtaClose?.addEventListener("click", dismissScrollCta);
 
 function closeMenu() {
   menuButton?.setAttribute("aria-expanded", "false");
@@ -93,9 +119,13 @@ answerTabs.forEach((tab, index) => {
   });
 });
 
-window.addEventListener("scroll", updateHeader, { passive: true });
+window.addEventListener("scroll", () => {
+  updateHeader();
+  updateScrollCta();
+}, { passive: true });
 window.addEventListener("resize", () => {
   if (window.innerWidth > 960) closeMenu();
 });
 
 updateHeader();
+updateScrollCta();

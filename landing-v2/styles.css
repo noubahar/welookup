@@ -631,6 +631,128 @@ img {
   font-size: 13px;
 }
 
+.scroll-cta[hidden] {
+  display: none;
+}
+
+.scroll-cta {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 60;
+  width: min(570px, calc(100vw - 48px));
+  padding: 28px;
+  border: 1px solid rgba(236, 239, 255, 0.17);
+  border-radius: 26px;
+  background: #12131a;
+  color: var(--text);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.46);
+  opacity: 0;
+  transform: translateY(26px) scale(0.98);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.scroll-cta.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.scroll-cta-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 146px;
+  align-items: end;
+  gap: 26px;
+}
+
+.scroll-cta-content {
+  min-width: 0;
+}
+
+.scroll-cta-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 54px 22px 0;
+  color: #9296a2;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.scroll-cta-label .material-symbols-rounded {
+  font-size: 21px;
+}
+
+.scroll-cta h2 {
+  margin: 0;
+  font-size: 29px;
+  line-height: 1.16;
+  letter-spacing: -0.04em;
+}
+
+.scroll-cta-content > p:not(.scroll-cta-label) {
+  margin: 14px 0 24px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.scroll-cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 12px;
+  background: #f7f7f3;
+  color: #111218;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.scroll-cta-button:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+}
+
+.scroll-cta-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid rgba(236, 239, 255, 0.18);
+  border-radius: 14px;
+  background: #15161d;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.scroll-cta-close:hover {
+  border-color: rgba(236, 239, 255, 0.34);
+  background: #1b1d26;
+}
+
+.scroll-cta-visual {
+  display: grid;
+  place-items: center;
+  min-height: 154px;
+  border: 1px solid rgba(147, 138, 255, 0.34);
+  border-radius: 20px;
+  background: #21195a;
+}
+
+.scroll-cta-visual img {
+  width: 82px;
+  height: 82px;
+  object-fit: contain;
+}
+
 .reveal {
   opacity: 1;
   transform: none;
@@ -848,6 +970,57 @@ img {
   .footer-inner {
     grid-template-columns: 1fr auto;
   }
+
+  .scroll-cta {
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .scroll-cta-grid {
+    grid-template-columns: minmax(0, 1fr) 84px;
+    gap: 16px;
+  }
+
+  .scroll-cta-label {
+    margin-bottom: 15px;
+    font-size: 12px;
+  }
+
+  .scroll-cta h2 {
+    font-size: 22px;
+  }
+
+  .scroll-cta-content > p:not(.scroll-cta-label) {
+    margin: 10px 0 18px;
+    font-size: 14px;
+  }
+
+  .scroll-cta-button {
+    min-height: 44px;
+    padding-inline: 16px;
+    font-size: 14px;
+  }
+
+  .scroll-cta-close {
+    top: 14px;
+    right: 14px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .scroll-cta-visual {
+    min-height: 96px;
+    border-radius: 16px;
+  }
+
+  .scroll-cta-visual img {
+    width: 58px;
+    height: 58px;
+  }
 }
 
 @media (max-width: 420px) {
@@ -861,5 +1034,17 @@ img {
 
   .media-placeholder span {
     font-size: 11px;
+  }
+
+  .scroll-cta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scroll-cta-visual {
+    display: none;
+  }
+
+  .scroll-cta h2 {
+    max-width: calc(100% - 36px);
   }
 }

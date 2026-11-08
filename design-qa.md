@@ -3,6 +3,7 @@
 ## Evidence
 
 - Source visual truth: `/Users/asus/.codex/generated_images/01a1bb34-bd79-72a3-9646-903ee7c19c08/exec-6349f39c-17d8-4f04-829a-29dc3ae0d5b2.png`
+- Scroll CTA reference: `/var/folders/zg/tt8jyzfn5kjfp92knh2jt8mw0000gn/T/codex-clipboard-1c49c785-abd7-4db2-b5e7-7e63d0b1f647.png`
 - Source pixels: `724 × 2172` generated long-page concept.
 - Implementation: `http://127.0.0.1:4173/landing-v2/`
 - Implementation screenshot evidence: full-page capture from the in-app browser in the active Product Design session.
@@ -55,6 +56,17 @@ The implementation intentionally uses the real WeLookup logo and accurate curren
 - Browser console warnings/errors checked: none.
 - JavaScript syntax check passed.
 - Existing homepage and shared site files were not modified.
+
+## Scroll CTA follow-up
+
+- The supplied Claude announcement was used as the structural reference: dark floating card, informational label, prominent heading, supporting copy, white CTA, visual tile, and dismiss control.
+- The implementation uses WeLookup copy, the real WeLookup logo, the existing Chrome Web Store URL, and the landing page's current visual tokens.
+- At initial page load and `scrollY = 0`, the announcement is hidden.
+- After scrolling beyond 360px, the announcement becomes visible in the lower-right corner without taking focus.
+- Desktop visual evidence was captured at `1440 × 1024`; the card fits within the viewport and does not cover the persistent header.
+- Mobile visual evidence was captured at `390 × 844`; the card measures approximately `366 × 248`, stays 12px from the viewport edges, and causes no horizontal overflow.
+- The dismiss control hides the card after its exit transition. Reloading the same tab at a scrolled position keeps it dismissed for that browser session.
+- Popup CTA URL, close control, initial hidden state, post-scroll visible state, desktop layout, mobile layout, and browser console were verified. No console warnings or errors were observed.
 
 ## Comparison history
 
