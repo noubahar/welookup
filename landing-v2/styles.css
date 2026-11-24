@@ -212,6 +212,13 @@ img {
   font-size: 14px;
 }
 
+.button-icon {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  margin-right: 10px;
+}
+
 .hero {
   position: relative;
   min-height: 810px;
