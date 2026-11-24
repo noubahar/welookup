@@ -2,26 +2,34 @@ const answerContent = {
   overview: {
     kicker: "Overview",
     title: "Get the big picture, fast.",
-    copy: "See store details, every detected technology and app, the Shopify theme when confirmed, and audit issues in one place.",
-    placeholder: "Media placeholder — Overview walkthrough",
+    copy: "Confirm the store platform, review public store details, and see detected apps, theme evidence, and audit issues in one place.",
+    points: ["Store and platform summary", "Apps and technologies count", "Shopify theme and audit signals when available"],
+    image: "/landing-v2/assets/product/overview.png",
+    imageAlt: "WeLookup Overview interface",
   },
   technology: {
     kicker: "Technology",
     title: "Reveal the tech behind the store.",
-    copy: "Identify platforms, apps, analytics, marketing tools, and commerce technologies on the current page.",
-    placeholder: "Media placeholder — Technology walkthrough",
+    copy: "Identify platforms, apps, analytics, marketing tools, and commerce technologies detected on the current public page.",
+    points: ["Grouped technology results", "Search and category filters", "Confidence shown with each detection"],
+    image: "/landing-v2/assets/product/technology.png",
+    imageAlt: "WeLookup Technology interface",
   },
   products: {
     kicker: "Products",
     title: "Explore the public catalog.",
-    copy: "Run a quick or full Shopify catalog scan, search products and collections, and export the results.",
-    placeholder: "Media placeholder — Products walkthrough",
+    copy: "On a confirmed Shopify storefront, scan products and collections, search the result, review pricing, and export the findings.",
+    points: ["Quick and full scan modes", "Product and collection search", "CSV export and pricing summary"],
+    image: "/landing-v2/assets/product/products.png",
+    imageAlt: "WeLookup Products interface",
   },
   audit: {
     kicker: "Audit",
     title: "Check AI and search readiness.",
-    copy: "Review whether a Shopify storefront is easy for AI agents and search assistants to understand and use.",
-    placeholder: "Media placeholder — Audit walkthrough",
+    copy: "Review whether a confirmed Shopify storefront is easy for AI agents and search assistants to understand and use.",
+    points: ["Readiness score out of 100", "Passed, warning, and failed checks", "Plain-language findings to review"],
+    image: "/landing-v2/assets/product/audit.png",
+    imageAlt: "WeLookup Audit interface",
   },
 };
 
@@ -33,7 +41,10 @@ const answerPanel = document.getElementById("answer-panel");
 const answerKicker = document.querySelector("[data-answer-kicker]");
 const answerTitle = document.querySelector("[data-answer-title]");
 const answerCopy = document.querySelector("[data-answer-copy]");
-const answerPlaceholder = document.querySelector("[data-answer-placeholder]");
+const answerPoints = document.querySelector("[data-answer-points]");
+const answerImage = document.querySelector("[data-answer-image]");
+const answerWindow = document.querySelector("[data-answer-window]");
+const answerShot = answerImage?.closest(".answer-shot");
 const scrollCta = document.querySelector("[data-scroll-cta]");
 const scrollCtaClose = document.querySelector("[data-scroll-cta-close]");
 const scrollCtaDismissedKey = "welookup-landing-v2-scroll-cta-dismissed";
@@ -100,8 +111,21 @@ function selectAnswer(key, shouldFocus = false) {
   answerKicker.textContent = content.kicker;
   answerTitle.textContent = content.title;
   answerCopy.textContent = content.copy;
-  answerPlaceholder.querySelector("span").textContent = content.placeholder;
-  answerPlaceholder.setAttribute("aria-label", content.placeholder);
+  answerPoints.replaceChildren(...content.points.map((point) => {
+    const item = document.createElement("li");
+    item.textContent = point;
+    return item;
+  }));
+
+  if (answerImage) {
+    answerShot?.classList.add("is-changing");
+    window.setTimeout(() => {
+      answerImage.src = content.image;
+      answerImage.alt = content.imageAlt;
+      answerWindow.textContent = content.kicker.toUpperCase();
+      answerShot?.classList.remove("is-changing");
+    }, 120);
+  }
 }
 
 answerTabs.forEach((tab, index) => {
