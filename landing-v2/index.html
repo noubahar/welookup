@@ -68,7 +68,6 @@
           </div>
           <div class="hero-panel hero-panel-technology" aria-hidden="true"><img src="/landing-v2/assets/product/technology.png" alt="" width="840" height="1440"></div>
           <div class="hero-panel hero-panel-audit" aria-hidden="true"><img src="/landing-v2/assets/product/audit.png" alt="" width="840" height="1440"></div>
-          <div class="hero-view-badge"><span class="material-symbols-rounded" aria-hidden="true">view_sidebar</span>Four focused views in one side panel</div>
         </div>
       </div>
     </section>
@@ -99,7 +98,7 @@
 
     <section class="answers section-space" id="product">
       <div class="shell">
-        <div class="section-heading reveal">
+        <div class="section-heading product-heading reveal">
           <p class="kicker">The product</p>
           <h2>Four views. One research workflow.</h2>
           <p>Each view answers a different question and keeps the result close to the page that produced it.</p>
@@ -137,7 +136,20 @@
           <p>WeLookup separates general storefront detection from Shopify-specific research, so the interface only shows evidence the current store supports.</p>
         </div>
         <div class="scope-table reveal" role="table" aria-label="WeLookup feature compatibility">
-          <div class="scope-row scope-head" role="row"><span role="columnheader">Capability</span><span role="columnheader">Public storefront</span><span role="columnheader">Shopify confirmed</span></div>
+          <div class="scope-row scope-head" role="row">
+            <span role="columnheader">Capability</span>
+            <span class="scope-platform-head" role="columnheader">
+              <span>Public storefront</span>
+              <span class="platform-logo-run" aria-label="Other storefront platforms including WordPress, WooCommerce, BigCommerce, Wix and Squarespace">
+                <img class="platform-logo platform-logo-1" src="/landing-v2/assets/platforms/wordpress.svg" alt="" width="18" height="18">
+                <img class="platform-logo platform-logo-2" src="/landing-v2/assets/platforms/woocommerce.svg" alt="" width="18" height="18">
+                <img class="platform-logo platform-logo-3" src="/landing-v2/assets/platforms/bigcommerce.svg" alt="" width="18" height="18">
+                <img class="platform-logo platform-logo-4" src="/landing-v2/assets/platforms/wix.svg" alt="" width="18" height="18">
+                <img class="platform-logo platform-logo-5" src="/landing-v2/assets/platforms/squarespace.svg" alt="" width="18" height="18">
+              </span>
+            </span>
+            <span class="scope-shopify-head" role="columnheader"><span>Shopify confirmed</span><img src="/landing-v2/assets/platforms/shopify.svg" alt="" width="21" height="24"></span>
+          </div>
           <div class="scope-row" role="row"><strong role="cell">Technology detection</strong><span class="scope-yes" role="cell" data-label="Public storefront"><span class="material-symbols-rounded" aria-hidden="true">check</span> Available</span><span class="scope-yes" role="cell" data-label="Shopify confirmed"><span class="material-symbols-rounded" aria-hidden="true">check</span> Available</span></div>
           <div class="scope-row" role="row"><strong role="cell">Store overview</strong><span class="scope-yes" role="cell" data-label="Public storefront"><span class="material-symbols-rounded" aria-hidden="true">check</span> Available</span><span class="scope-yes" role="cell" data-label="Shopify confirmed"><span class="material-symbols-rounded" aria-hidden="true">check</span> Enhanced</span></div>
           <div class="scope-row" role="row"><strong role="cell">Theme evidence</strong><span class="scope-na" role="cell" data-label="Public storefront">Not shown</span><span class="scope-yes" role="cell" data-label="Shopify confirmed"><span class="material-symbols-rounded" aria-hidden="true">check</span> Available</span></div>
@@ -167,7 +179,8 @@
         <div class="privacy-copy">
           <p class="kicker">Designed for control</p>
           <h2>Public evidence, analyzed beside the page.</h2>
-          <p>WeLookup reads the active public storefront only when you use it. It does not require a store login or access to the merchant admin.</p>
+          <p class="privacy-summary">WeLookup reads the active public storefront only when you use it. It does not require a store login or access to the merchant admin.</p>
+          <p class="privacy-note">More detail is available in the <a href="/privacy-policy.html">privacy policy</a>.</p>
         </div>
         <div class="privacy-cards">
           <article><span class="material-symbols-rounded" aria-hidden="true">pageview</span><div><h3>Why page access?</h3><p>To inspect the public page you are viewing and identify visible storefront signals.</p></div></article>
