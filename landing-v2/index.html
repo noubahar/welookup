@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/landing-v2/styles.css?v=20261125b">
+  <link rel="stylesheet" href="/landing-v2/styles.css?v=20261125c">
   <script src="/landing-v2/script.js?v=20261125b" defer></script>
 </head>
 
@@ -81,16 +81,60 @@
         </div>
         <ol class="workflow-grid">
           <li class="workflow-step reveal">
-            <span class="workflow-icon material-symbols-rounded" aria-hidden="true">language</span>
-            <div><p class="step-label">Step 1</p><h3>Open a storefront</h3><p>Visit the public store you want to understand in Chrome.</p></div>
+            <div class="workflow-motion workflow-motion-store" aria-hidden="true">
+              <div class="motion-browser motion-browser-store">
+                <div class="motion-browser-bar">
+                  <span class="motion-browser-dots"><i></i><i></i><i></i></span>
+                  <span class="motion-address"><span class="material-symbols-rounded">lock</span><span class="motion-url">storefront.example</span><i class="motion-caret"></i></span>
+                </div>
+                <div class="motion-store-page">
+                  <div class="motion-store-nav"><span></span><span></span><span></span></div>
+                  <div class="motion-store-hero"><i></i><i></i><i></i></div>
+                  <div class="motion-store-products"><span></span><span></span><span></span></div>
+                </div>
+              </div>
+              <span class="motion-status"><i></i> Public storefront</span>
+            </div>
+            <div class="workflow-copy"><p class="step-label"><span>01</span> Open</p><h3>Open a storefront</h3><p>Visit the public store you want to understand in Chrome.</p></div>
           </li>
           <li class="workflow-step reveal">
-            <span class="workflow-icon material-symbols-rounded" aria-hidden="true">view_sidebar</span>
-            <div><p class="step-label">Step 2</p><h3>Open WeLookup</h3><p>Launch the extension beside the page and refresh the analysis when needed.</p></div>
+            <div class="workflow-motion workflow-motion-launch" aria-hidden="true">
+              <div class="motion-browser motion-browser-launch">
+                <div class="motion-browser-bar">
+                  <span class="motion-browser-dots"><i></i><i></i><i></i></span>
+                  <span class="motion-toolbar">
+                    <i class="material-symbols-rounded">star</i>
+                    <span class="motion-extension"><img src="/welookuplogo.png" alt="" width="30" height="30"></span>
+                    <i class="material-symbols-rounded">extension</i>
+                  </span>
+                </div>
+                <div class="motion-launch-page"><span></span><span></span><span></span></div>
+                <div class="motion-side-panel">
+                  <div><img src="/welookuplogo.png" alt="" width="22" height="22"><b>WeLookup</b></div>
+                  <i></i><i></i><i></i>
+                </div>
+              </div>
+              <span class="motion-click-ring"></span>
+              <svg class="motion-pointer" viewBox="0 0 36 46" aria-hidden="true"><path d="M3 2l6.4 34.8 8.2-8.7 6.7 13.2 6.2-3.2-6.8-13 11.8-1.8z"/></svg>
+              <span class="motion-status"><i></i> Side panel ready</span>
+            </div>
+            <div class="workflow-copy"><p class="step-label"><span>02</span> Launch</p><h3>Open WeLookup</h3><p>Click the extension icon to open WeLookup beside the current page.</p></div>
           </li>
           <li class="workflow-step reveal">
-            <span class="workflow-icon material-symbols-rounded" aria-hidden="true">fact_check</span>
-            <div><p class="step-label">Step 3</p><h3>Review the evidence</h3><p>Move between Overview, Technology, Products, and Audit without leaving the store.</p></div>
+            <div class="workflow-motion workflow-motion-review" aria-hidden="true">
+              <div class="motion-review-panel">
+                <div class="motion-review-head"><span><img src="/welookuplogo.png" alt="" width="20" height="20">WeLookup</span><i class="material-symbols-rounded">refresh</i></div>
+                <div class="motion-review-tabs"><span class="is-active"></span><span></span><span></span><span></span></div>
+                <div class="motion-review-progress"><i></i></div>
+                <div class="motion-review-results">
+                  <span><i class="material-symbols-rounded">check</i><b>Platform confirmed</b><em>Shopify</em></span>
+                  <span><i class="material-symbols-rounded">apps</i><b>Technologies</b><em>16 found</em></span>
+                  <span><i class="material-symbols-rounded">fact_check</i><b>Audit</b><em>Ready</em></span>
+                </div>
+              </div>
+              <span class="motion-status"><i></i> Evidence organized</span>
+            </div>
+            <div class="workflow-copy"><p class="step-label"><span>03</span> Review</p><h3>Review the evidence</h3><p>Move between Overview, Technology, Products, and Audit without leaving the store.</p></div>
           </li>
         </ol>
       </div>
