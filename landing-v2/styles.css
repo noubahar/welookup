@@ -435,25 +435,28 @@ img {
 .hero-app-cloud {
   position: absolute;
   inset: 0;
-  z-index: 5;
   pointer-events: none;
 }
 
 .hero-app-orb {
-  --app-size: 42px;
+  --app-size: 54px;
   --app-tilt: 0deg;
   --app-drift-x: 4px;
   --app-drift-y: -10px;
+  --app-parallax-x: 0px;
+  --app-parallax-y: 0px;
+  --app-parallax-rotate: 0deg;
   position: absolute;
+  z-index: var(--app-z, 5);
   width: var(--app-size);
   height: var(--app-size);
   display: block;
   overflow: hidden;
-  border: 1px solid rgba(236, 239, 255, 0.26);
-  border-radius: clamp(10px, calc(var(--app-size) * .28), 16px);
+  border: 1px solid rgba(236, 239, 255, 0.34);
+  border-radius: clamp(13px, calc(var(--app-size) * .28), 20px);
   background: #111522;
-  box-shadow: 0 15px 34px rgba(0, 0, 0, 0.42), inset 0 1px rgba(255, 255, 255, 0.12);
-  transform: translate3d(0, 0, 0) rotate(var(--app-tilt));
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.48), 0 5px 14px rgba(0, 0, 0, 0.22), inset 0 1px rgba(255, 255, 255, 0.16);
+  transform: translate3d(var(--app-parallax-x), var(--app-parallax-y), 0) rotate(calc(var(--app-tilt) + var(--app-parallax-rotate)));
   animation: app-orb-float var(--app-duration, 7s) ease-in-out var(--app-delay, 0s) infinite;
   will-change: transform;
 }
@@ -464,23 +467,23 @@ img {
   object-fit: cover;
 }
 
-.hero-app-orb-1 { --app-size: 46px; --app-tilt: -8deg; --app-duration: 6.8s; --app-delay: -1.4s; --app-drift-x: 5px; left: -22px; top: 86px; }
-.hero-app-orb-2 { --app-size: 38px; --app-tilt: 7deg; --app-duration: 8.4s; --app-delay: -4.2s; --app-drift-x: -4px; left: 92px; top: -24px; }
-.hero-app-orb-3 { --app-size: 52px; --app-tilt: 5deg; --app-duration: 7.6s; --app-delay: -2.2s; --app-drift-x: -6px; right: -30px; top: 108px; }
-.hero-app-orb-4 { --app-size: 48px; --app-tilt: -6deg; --app-duration: 8.8s; --app-delay: -5.1s; --app-drift-x: 4px; left: -30px; bottom: 152px; }
-.hero-app-orb-5 { --app-size: 42px; --app-tilt: 8deg; --app-duration: 6.4s; --app-delay: -3.6s; --app-drift-x: -5px; right: -20px; bottom: 112px; }
-.hero-app-orb-6 { --app-size: 35px; --app-tilt: 10deg; --app-duration: 9.2s; --app-delay: -6.8s; --app-drift-x: 3px; right: 66px; top: -28px; }
-.hero-app-orb-7 { --app-size: 44px; --app-tilt: -5deg; --app-duration: 7.2s; --app-delay: -2.9s; --app-drift-x: 6px; left: 126px; bottom: -20px; }
-.hero-app-orb-8 { --app-size: 37px; --app-tilt: 6deg; --app-duration: 8.1s; --app-delay: -4.7s; --app-drift-x: -3px; right: 108px; bottom: -22px; }
-.hero-app-orb-9 { --app-size: 34px; --app-tilt: -9deg; --app-duration: 7.9s; --app-delay: -5.8s; --app-drift-x: 4px; left: 20px; top: 286px; }
-.hero-app-orb-10 { --app-size: 45px; --app-tilt: 4deg; --app-duration: 6.9s; --app-delay: -1.8s; --app-drift-x: -5px; right: -4px; top: 310px; }
+.hero-app-orb-1 { --app-size: 64px; --app-z: 6; --app-tilt: -8deg; --app-duration: 6.8s; --app-delay: -1.4s; --app-drift-x: 6px; left: -24px; top: 112px; }
+.hero-app-orb-2 { --app-size: 52px; --app-z: 2; --app-tilt: 7deg; --app-duration: 8.4s; --app-delay: -4.2s; --app-drift-x: -4px; left: 104px; top: -24px; opacity: 0.82; }
+.hero-app-orb-3 { --app-size: 72px; --app-z: 6; --app-tilt: 5deg; --app-duration: 7.6s; --app-delay: -2.2s; --app-drift-x: -7px; right: -34px; top: 136px; }
+.hero-app-orb-4 { --app-size: 66px; --app-z: 5; --app-tilt: -6deg; --app-duration: 8.8s; --app-delay: -5.1s; --app-drift-x: 5px; left: -32px; bottom: 164px; }
+.hero-app-orb-5 { --app-size: 60px; --app-z: 6; --app-tilt: 8deg; --app-duration: 6.4s; --app-delay: -3.6s; --app-drift-x: -6px; right: -24px; bottom: 100px; }
+.hero-app-orb-6 { --app-size: 48px; --app-z: 2; --app-tilt: 10deg; --app-duration: 9.2s; --app-delay: -6.8s; --app-drift-x: 3px; right: 76px; top: -20px; opacity: 0.78; }
+.hero-app-orb-7 { --app-size: 62px; --app-z: 5; --app-tilt: -5deg; --app-duration: 7.2s; --app-delay: -2.9s; --app-drift-x: 7px; left: 122px; bottom: -24px; }
+.hero-app-orb-8 { --app-size: 52px; --app-z: 4; --app-tilt: 6deg; --app-duration: 8.1s; --app-delay: -4.7s; --app-drift-x: -4px; right: 104px; bottom: -26px; }
+.hero-app-orb-9 { --app-size: 48px; --app-z: 4; --app-tilt: -9deg; --app-duration: 7.9s; --app-delay: -5.8s; --app-drift-x: 5px; left: 10px; top: 320px; }
+.hero-app-orb-10 { --app-size: 64px; --app-z: 4; --app-tilt: 4deg; --app-duration: 6.9s; --app-delay: -1.8s; --app-drift-x: -6px; right: -14px; top: 350px; }
 
 @keyframes app-orb-float {
   0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(var(--app-tilt));
+    transform: translate3d(var(--app-parallax-x), var(--app-parallax-y), 0) rotate(calc(var(--app-tilt) + var(--app-parallax-rotate)));
   }
   50% {
-    transform: translate3d(var(--app-drift-x), var(--app-drift-y), 0) rotate(calc(var(--app-tilt) + 3deg));
+    transform: translate3d(calc(var(--app-parallax-x) + var(--app-drift-x)), calc(var(--app-parallax-y) + var(--app-drift-y)), 0) rotate(calc(var(--app-tilt) + var(--app-parallax-rotate) + 3deg));
   }
 }
 
@@ -1785,10 +1788,10 @@ img {
     width: 220px;
   }
 
-  .hero-app-orb-1 { left: -10px; }
-  .hero-app-orb-3 { right: -12px; }
-  .hero-app-orb-4 { left: -12px; }
-  .hero-app-orb-5 { right: -8px; }
+  .hero-app-orb-1 { left: -12px; }
+  .hero-app-orb-3 { right: -16px; }
+  .hero-app-orb-4 { left: -14px; }
+  .hero-app-orb-5 { right: -10px; }
 
   .compatibility-grid,
   .privacy-inner {
@@ -2078,11 +2081,11 @@ img {
     display: none;
   }
 
-  .hero-app-orb-1 { --app-size: 40px; left: 4px; top: 86px; }
-  .hero-app-orb-3 { --app-size: 44px; right: 4px; top: 124px; }
-  .hero-app-orb-5 { --app-size: 36px; right: 8px; bottom: 78px; }
-  .hero-app-orb-7 { --app-size: 38px; left: 66px; bottom: -2px; }
-  .hero-app-orb-9 { --app-size: 30px; left: 3px; top: 302px; }
+  .hero-app-orb-1 { --app-size: 50px; left: 2px; top: 96px; }
+  .hero-app-orb-3 { --app-size: 56px; right: 2px; top: 136px; }
+  .hero-app-orb-5 { --app-size: 46px; right: 6px; bottom: 68px; }
+  .hero-app-orb-7 { --app-size: 48px; left: 58px; bottom: -8px; }
+  .hero-app-orb-9 { --app-size: 38px; left: 2px; top: 308px; }
 
   .section-heading {
     text-align: left;

@@ -47,9 +47,61 @@ const answerWindow = document.querySelector("[data-answer-window]");
 const answerShot = answerImage?.closest(".answer-shot");
 const scrollCta = document.querySelector("[data-scroll-cta]");
 const scrollCtaClose = document.querySelector("[data-scroll-cta-close]");
+const hero = document.querySelector(".hero");
+const heroAppOrbs = Array.from(document.querySelectorAll(".hero-app-orb"));
 const scrollCtaDismissedKey = "welookup-landing-v2-scroll-cta-dismissed";
 let scrollCtaDismissed = sessionStorage.getItem(scrollCtaDismissedKey) === "true";
 let scrollCtaShown = false;
+
+function enableHeroAppParallax() {
+  if (!hero || !heroAppOrbs.length) return;
+  if (!window.matchMedia("(pointer: fine)").matches) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  let targetX = 0;
+  let targetY = 0;
+  let currentX = 0;
+  let currentY = 0;
+  let animationFrame = 0;
+
+  function renderParallax() {
+    currentX += (targetX - currentX) * 0.085;
+    currentY += (targetY - currentY) * 0.085;
+
+    heroAppOrbs.forEach((orb) => {
+      const depth = Number(orb.dataset.depth) || 0.5;
+      orb.style.setProperty("--app-parallax-x", `${(currentX * depth).toFixed(2)}px`);
+      orb.style.setProperty("--app-parallax-y", `${(currentY * depth).toFixed(2)}px`);
+      orb.style.setProperty("--app-parallax-rotate", `${(currentX * depth * 0.15).toFixed(2)}deg`);
+    });
+
+    if (Math.abs(targetX - currentX) > 0.02 || Math.abs(targetY - currentY) > 0.02) {
+      animationFrame = window.requestAnimationFrame(renderParallax);
+      return;
+    }
+
+    animationFrame = 0;
+  }
+
+  function queueParallax() {
+    if (!animationFrame) animationFrame = window.requestAnimationFrame(renderParallax);
+  }
+
+  hero.addEventListener("pointermove", (event) => {
+    const bounds = hero.getBoundingClientRect();
+    const normalizedX = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const normalizedY = (event.clientY - bounds.top) / bounds.height - 0.5;
+    targetX = normalizedX * 34;
+    targetY = normalizedY * 26;
+    queueParallax();
+  }, { passive: true });
+
+  hero.addEventListener("pointerleave", () => {
+    targetX = 0;
+    targetY = 0;
+    queueParallax();
+  });
+}
 
 function updateHeader() {
   header?.classList.toggle("is-scrolled", window.scrollY > 12);
@@ -153,3 +205,4 @@ window.addEventListener("resize", () => {
 
 updateHeader();
 updateScrollCta();
+enableHeroAppParallax();
