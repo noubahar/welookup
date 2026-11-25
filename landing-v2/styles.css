@@ -1293,7 +1293,7 @@ img {
 
 .scope-row {
   display: grid;
-  grid-template-columns: 0.95fr 1.45fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: center;
   min-height: 72px;
   padding: 0 24px;
