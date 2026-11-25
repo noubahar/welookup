@@ -679,7 +679,7 @@ img {
   padding: 12px;
   overflow: hidden;
   border-radius: 10px;
-  background: linear-gradient(120deg, #24356f, #5f50ff 58%, #8c82ff);
+  background: linear-gradient(120deg, #293140, #3a4352 58%, #525c6b);
 }
 
 .motion-store-hero::after {
@@ -776,12 +776,17 @@ img {
   border-radius: 8px;
   background: #222b5c;
   box-shadow: 0 0 0 4px rgba(95, 80, 255, 0.08);
+  animation: workflow-extension-glow 7.2s ease infinite;
 }
 
 .motion-extension img {
+  position: relative;
+  z-index: 5;
   width: 21px;
   height: 21px;
   object-fit: contain;
+  transform-origin: center;
+  animation: workflow-extension-pulse 7.2s ease infinite;
 }
 
 .motion-launch-page {
@@ -842,12 +847,13 @@ img {
   z-index: 8;
   width: 28px;
   height: 36px;
-  right: 49px;
-  top: 48px;
+  left: 11.5px;
+  top: 12px;
   overflow: visible;
   opacity: 0;
   filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.45));
   transform: translate(-185px, 118px);
+  transform-origin: 3px 2px;
   animation: workflow-pointer 7.2s cubic-bezier(.2, .7, .2, 1) infinite;
 }
 
@@ -860,15 +866,26 @@ img {
 
 .motion-click-ring {
   position: absolute;
-  z-index: 7;
+  z-index: 6;
   width: 28px;
   height: 28px;
-  right: 48px;
-  top: 47px;
+  left: 0;
+  top: 0;
   border: 2px solid #8e84ff;
   border-radius: 50%;
+  background: rgba(142, 132, 255, 0.22);
+  box-shadow: 0 0 18px rgba(142, 132, 255, 0.52);
   opacity: 0;
   animation: workflow-click 7.2s ease-out infinite;
+}
+
+.motion-click-ring::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
 }
 
 .motion-review-panel {
@@ -1030,9 +1047,23 @@ img {
 }
 
 @keyframes workflow-click {
-  0%, 43% { opacity: 0; transform: scale(.45); }
-  47% { opacity: .9; }
-  58%, 100% { opacity: 0; transform: scale(2.4); }
+  0%, 43% { opacity: 0; transform: scale(.25); }
+  47% { opacity: 1; transform: scale(.72); }
+  52% { opacity: .92; transform: scale(1); }
+  64%, 100% { opacity: 0; transform: scale(2.6); }
+}
+
+@keyframes workflow-extension-pulse {
+  0%, 42%, 100% { transform: scale(1); filter: brightness(1); }
+  47% { transform: scale(.84); filter: brightness(1.12); }
+  53% { transform: scale(1.2); filter: brightness(1.35); }
+  62% { transform: scale(1); filter: brightness(1); }
+}
+
+@keyframes workflow-extension-glow {
+  0%, 42%, 100% { background: #222b5c; box-shadow: 0 0 0 4px rgba(95, 80, 255, 0.08); }
+  49% { background: #3546a0; box-shadow: 0 0 0 7px rgba(116, 102, 255, 0.22), 0 0 22px rgba(116, 102, 255, 0.62); }
+  62% { background: #222b5c; box-shadow: 0 0 0 4px rgba(95, 80, 255, 0.08); }
 }
 
 @keyframes workflow-panel-open {
