@@ -9,9 +9,9 @@ const answerContent = {
   },
   technology: {
     kicker: "Technology",
-    title: "Reveal the tech behind the store.",
-    copy: "Identify platforms, apps, analytics, marketing tools, and commerce technologies detected on the current public page.",
-    points: ["Grouped technology results", "Search and category filters", "Confidence shown with each detection"],
+    title: "Reveal the technology behind the store.",
+    copy: "Match public storefront signals against 8,244 technology signatures, including 873 Shopify apps, across platforms, analytics, marketing, reviews, support, payments, and more.",
+    points: ["Complete public-page signal scan", "8,244 signatures, including 873 Shopify apps", "Search, category filters, and confidence"],
     image: "/landing-v2/assets/product/technology.png",
     imageAlt: "WeLookup Technology interface",
   },
