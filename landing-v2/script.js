@@ -58,24 +58,43 @@ function enableHeroAppParallax() {
   if (!window.matchMedia("(pointer: fine)").matches) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  let targetX = 0;
-  let targetY = 0;
-  let currentX = 0;
-  let currentY = 0;
+  let pointerX = 0;
+  let pointerY = 0;
   let animationFrame = 0;
+  const orbMotion = heroAppOrbs.map((orb) => ({
+    orb,
+    motionX: Number(orb.dataset.motionX) || 0,
+    motionY: Number(orb.dataset.motionY) || 0,
+    cross: Number(orb.dataset.cross) || 0,
+    turn: Number(orb.dataset.turn) || 0,
+    lag: Number(orb.dataset.lag) || 0.07,
+    currentX: 0,
+    currentY: 0,
+    currentTurn: 0,
+  }));
 
   function renderParallax() {
-    currentX += (targetX - currentX) * 0.085;
-    currentY += (targetY - currentY) * 0.085;
+    let isMoving = false;
 
-    heroAppOrbs.forEach((orb) => {
-      const depth = Number(orb.dataset.depth) || 0.5;
-      orb.style.setProperty("--app-parallax-x", `${(currentX * depth).toFixed(2)}px`);
-      orb.style.setProperty("--app-parallax-y", `${(currentY * depth).toFixed(2)}px`);
-      orb.style.setProperty("--app-parallax-rotate", `${(currentX * depth * 0.15).toFixed(2)}deg`);
+    orbMotion.forEach((motion) => {
+      const targetX = pointerX * 36 * motion.motionX + pointerY * 16 * motion.cross;
+      const targetY = pointerY * 28 * motion.motionY - pointerX * 14 * motion.cross;
+      const targetTurn = pointerX * 5 * motion.turn + pointerY * 3 * motion.cross;
+
+      motion.currentX += (targetX - motion.currentX) * motion.lag;
+      motion.currentY += (targetY - motion.currentY) * motion.lag;
+      motion.currentTurn += (targetTurn - motion.currentTurn) * motion.lag;
+
+      motion.orb.style.setProperty("--app-parallax-x", `${motion.currentX.toFixed(2)}px`);
+      motion.orb.style.setProperty("--app-parallax-y", `${motion.currentY.toFixed(2)}px`);
+      motion.orb.style.setProperty("--app-parallax-rotate", `${motion.currentTurn.toFixed(2)}deg`);
+
+      if (Math.abs(targetX - motion.currentX) > 0.02 || Math.abs(targetY - motion.currentY) > 0.02 || Math.abs(targetTurn - motion.currentTurn) > 0.02) {
+        isMoving = true;
+      }
     });
 
-    if (Math.abs(targetX - currentX) > 0.02 || Math.abs(targetY - currentY) > 0.02) {
+    if (isMoving) {
       animationFrame = window.requestAnimationFrame(renderParallax);
       return;
     }
@@ -89,16 +108,14 @@ function enableHeroAppParallax() {
 
   hero.addEventListener("pointermove", (event) => {
     const bounds = hero.getBoundingClientRect();
-    const normalizedX = (event.clientX - bounds.left) / bounds.width - 0.5;
-    const normalizedY = (event.clientY - bounds.top) / bounds.height - 0.5;
-    targetX = normalizedX * 34;
-    targetY = normalizedY * 26;
+    pointerX = (event.clientX - bounds.left) / bounds.width - 0.5;
+    pointerY = (event.clientY - bounds.top) / bounds.height - 0.5;
     queueParallax();
   }, { passive: true });
 
   hero.addEventListener("pointerleave", () => {
-    targetX = 0;
-    targetY = 0;
+    pointerX = 0;
+    pointerY = 0;
     queueParallax();
   });
 }
