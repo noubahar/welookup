@@ -1606,10 +1606,10 @@ img {
   right: 24px;
   bottom: 24px;
   z-index: 60;
-  width: min(580px, calc(100vw - 48px));
-  padding: 28px;
+  width: min(440px, calc(100vw - 48px));
+  padding: 20px;
   border: 1px solid rgba(236, 239, 255, 0.17);
-  border-radius: 26px;
+  border-radius: 22px;
   background: #12131a;
   color: var(--text);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.46);
@@ -1625,9 +1625,9 @@ img {
 
 .scroll-cta-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 146px;
-  align-items: end;
-  gap: 26px;
+  grid-template-columns: minmax(0, 1fr) 108px;
+  align-items: center;
+  gap: 18px;
 }
 
 .scroll-cta-content {
@@ -1638,28 +1638,28 @@ img {
   display: flex;
   align-items: center;
   gap: 9px;
-  margin: 0 54px 22px 0;
+  margin: 0 42px 14px 0;
   color: #9296a2;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .scroll-cta-label .material-symbols-rounded {
   color: var(--primary-soft);
-  font-size: 21px;
+  font-size: 19px;
 }
 
 .scroll-cta h2 {
   margin: 0;
-  font-size: 29px;
+  font-size: 23px;
   line-height: 1.16;
   letter-spacing: -0.04em;
 }
 
 .scroll-cta-content > p:not(.scroll-cta-label) {
-  margin: 14px 0 24px;
+  margin: 10px 0 17px;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.55;
 }
 
@@ -1667,9 +1667,9 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 0 20px;
-  border-radius: 12px;
+  min-height: 42px;
+  padding: 0 17px;
+  border-radius: 11px;
   background: #f7f7f3;
   color: #111218;
   font-weight: 800;
@@ -1684,16 +1684,16 @@ img {
 
 .scroll-cta-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 14px;
+  right: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
+  width: 38px;
+  height: 38px;
   padding: 0;
   border: 1px solid rgba(236, 239, 255, 0.18);
-  border-radius: 14px;
+  border-radius: 12px;
   background: #15161d;
   color: var(--text);
   cursor: pointer;
@@ -1702,15 +1702,15 @@ img {
 .scroll-cta-visual {
   display: grid;
   place-items: center;
-  min-height: 154px;
+  min-height: 112px;
   border: 1px solid rgba(163, 156, 255, 0.34);
-  border-radius: 20px;
+  border-radius: 16px;
   background: var(--navy);
 }
 
 .scroll-cta-visual img {
-  width: 82px;
-  height: 82px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
 }
 
@@ -2208,50 +2208,50 @@ img {
   .scroll-cta {
     right: 12px;
     bottom: 12px;
-    width: calc(100vw - 24px);
-    padding: 22px;
-    border-radius: 22px;
+    width: min(360px, calc(100vw - 24px));
+    padding: 18px;
+    border-radius: 19px;
   }
 
   .scroll-cta-grid {
-    grid-template-columns: minmax(0, 1fr) 84px;
-    gap: 16px;
+    grid-template-columns: minmax(0, 1fr) 72px;
+    gap: 14px;
   }
 
   .scroll-cta-label {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     font-size: 12px;
   }
 
   .scroll-cta h2 {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .scroll-cta-content > p:not(.scroll-cta-label) {
-    margin: 10px 0 18px;
-    font-size: 14px;
+    margin: 8px 0 14px;
+    font-size: 13px;
   }
 
   .scroll-cta-button {
-    min-height: 44px;
-    padding-inline: 16px;
-    font-size: 14px;
+    min-height: 40px;
+    padding-inline: 14px;
+    font-size: 13px;
   }
 
   .scroll-cta-close {
-    top: 14px;
-    right: 14px;
-    width: 40px;
-    height: 40px;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
   }
 
   .scroll-cta-visual {
-    min-height: 96px;
+    min-height: 82px;
   }
 
   .scroll-cta-visual img {
-    width: 58px;
-    height: 58px;
+    width: 48px;
+    height: 48px;
   }
 }
 
@@ -2285,11 +2285,21 @@ img {
     grid-template-columns: 1fr;
   }
 
+  .scroll-cta {
+    width: min(320px, calc(100vw - 24px));
+    padding: 16px;
+  }
+
   .scroll-cta-visual {
     display: none;
   }
 
   .scroll-cta h2 {
     max-width: calc(100% - 36px);
+    font-size: 19px;
+  }
+
+  .scroll-cta-content > p:not(.scroll-cta-label) {
+    display: none;
   }
 }
