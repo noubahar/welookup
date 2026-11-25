@@ -659,7 +659,7 @@ img {
 
 .scope-row {
   display: grid;
-  grid-template-columns: 1.05fr 1.3fr 1fr;
+  grid-template-columns: 0.95fr 1.45fr 1fr;
   align-items: center;
   min-height: 72px;
   padding: 0 24px;
@@ -670,7 +670,7 @@ img {
 }
 
 .scope-head {
-  min-height: 64px;
+  min-height: 72px;
   background: rgba(95, 80, 255, 0.09);
   color: var(--muted);
   font-size: 12px;
@@ -688,8 +688,8 @@ img {
 }
 
 .scope-platform-head {
-  gap: 3px;
-  font-size: 10.5px;
+  gap: 5px;
+  font-size: 11px;
   letter-spacing: 0.04em;
 }
 
@@ -702,25 +702,39 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 0;
-  height: 18px;
+  height: 26px;
 }
 
 .platform-logo {
-  width: 14px;
-  height: 14px;
+  position: relative;
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  padding: 3px;
+  border: 1px solid rgba(228, 232, 255, 0.68);
+  border-radius: 7px;
+  background: #f5f7ff;
   object-fit: contain;
+  box-shadow: 0 4px 12px rgba(4, 6, 16, 0.24);
 }
 
-.platform-logo-1 { opacity: 1; }
-.platform-logo-2 { opacity: 0.76; }
-.platform-logo-3 { opacity: 0.53; }
-.platform-logo-4 { opacity: 0.31; }
-.platform-logo-5 { opacity: 0.13; }
+.platform-logo + .platform-logo { margin-left: -6px; }
+.platform-logo-1 { z-index: 5; opacity: 1; }
+.platform-logo-2 { z-index: 4; opacity: 0.92; }
+.platform-logo-3 { z-index: 3; opacity: 0.8; }
+.platform-logo-4 { z-index: 2; opacity: 0.64; }
+.platform-logo-5 { z-index: 1; opacity: 0.46; }
 
 .scope-shopify-head img {
-  width: 19px;
-  height: 22px;
+  width: 28px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 4px;
+  border: 1px solid rgba(228, 232, 255, 0.68);
+  border-radius: 8px;
+  background: #f5f7ff;
   object-fit: contain;
+  box-shadow: 0 4px 12px rgba(4, 6, 16, 0.24);
 }
 
 .scope-row strong {
@@ -1131,6 +1145,60 @@ img {
   .product-heading > p:last-child {
     max-width: none;
     white-space: nowrap;
+  }
+}
+
+@media (min-width: 961px) and (max-width: 1080px) {
+  .scope-platform-head {
+    gap: 3px;
+    font-size: 10px;
+  }
+
+  .platform-logo-run {
+    height: 24px;
+  }
+
+  .platform-logo {
+    width: 22px;
+    height: 22px;
+  }
+
+  .platform-logo + .platform-logo {
+    margin-left: -7px;
+  }
+
+  .scope-shopify-head {
+    gap: 4px;
+    font-size: 9.5px;
+  }
+
+  .scope-shopify-head img {
+    width: 24px;
+    height: 26px;
+    padding: 3px;
+  }
+}
+
+@media (min-width: 1081px) {
+  .platform-logo-run {
+    height: 32px;
+  }
+
+  .platform-logo {
+    width: 30px;
+    height: 30px;
+    padding: 4px;
+    border-radius: 8px;
+  }
+
+  .platform-logo + .platform-logo {
+    margin-left: -8px;
+  }
+
+  .scope-shopify-head img {
+    width: 34px;
+    height: 36px;
+    padding: 5px;
   }
 }
 
