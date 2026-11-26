@@ -189,6 +189,8 @@ img {
   border-radius: 14px;
   background: var(--primary);
   color: #fff;
+  font-size: 15px;
+  line-height: 1;
   font-weight: 700;
   text-decoration: none;
   box-shadow: 0 14px 34px rgba(67, 51, 255, 0.22);
@@ -212,6 +214,12 @@ img {
   font-size: 14px;
 }
 
+.button-small .button-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
 .button-icon {
   flex: 0 0 auto;
   width: 22px;
@@ -221,8 +229,9 @@ img {
 
 .hero {
   position: relative;
-  min-height: 810px;
-  padding-top: 104px;
+  min-height: 740px;
+  padding-top: 64px;
+  padding-bottom: 70px;
   overflow: hidden;
   background:
     radial-gradient(circle at 78% 40%, rgba(95, 80, 255, 0.17), transparent 32%),
@@ -275,9 +284,9 @@ img {
 
 .hero h1 {
   max-width: 680px;
-  margin: 26px 0 22px;
-  font-size: clamp(52px, 6vw, 82px);
-  line-height: 0.99;
+  margin: 20px 0 18px;
+  font-size: clamp(42px, 4.1vw, 60px);
+  line-height: 1.03;
   letter-spacing: -0.06em;
   font-weight: 800;
 }
@@ -286,15 +295,21 @@ img {
   max-width: 650px;
   margin: 0;
   color: var(--muted-strong);
-  font-size: clamp(17px, 1.7vw, 20px);
-  line-height: 1.58;
+  font-size: clamp(16px, 1.45vw, 18px);
+  line-height: 1.52;
 }
 
 .hero-actions {
   display: flex;
   align-items: center;
   gap: 24px;
-  margin-top: 34px;
+  margin-top: 26px;
+}
+
+.hero-actions .button,
+.final-cta .button {
+  width: 176px;
+  min-width: 176px;
 }
 
 .text-link {
@@ -316,7 +331,7 @@ img {
   display: flex;
   flex-wrap: wrap;
   gap: 12px 20px;
-  margin: 30px 0 0;
+  margin: 22px 0 0;
   padding: 0;
   color: var(--muted);
   list-style: none;
