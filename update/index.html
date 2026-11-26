@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta name="description" content="Explore WeLookup 1.1.0: redesigned Overview, Technology, Products and Audit views, broader detection, local analysis and faster Shopify research in Chrome.">
+  <meta name="description" content="WeLookup 1.1.0 is now active. See the new Overview, Technology, Products and Audit views, broader detection, local analysis and Shopify research updates.">
   <meta name="theme-color" content="#070912">
-  <meta property="og:title" content="WeLookup 1.1.0 Release Notes | Storefront Research Update">
-  <meta property="og:description" content="See what is new in WeLookup 1.1.0, including four focused research views, Shopify catalog tools, AI-readiness checks and local browser analysis.">
+  <meta property="og:title" content="WeLookup 1.1.0 Is Ready | See What Changed">
+  <meta property="og:description" content="Your WeLookup extension has been updated. Explore the four focused views, broader detection, local analysis and improved Shopify research workflow.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://welookup.info/update/">
   <meta property="og:image" content="https://welookup.info/welookuplogo.png">
@@ -15,18 +15,18 @@
   <meta property="article:published_time" content="2026-11-25">
   <meta property="article:modified_time" content="2026-11-26">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="WeLookup 1.1.0 Release Notes">
-  <meta name="twitter:description" content="A clearer, faster Chrome side panel for storefront technology, Shopify catalog and AI-readiness research.">
+  <meta name="twitter:title" content="WeLookup 1.1.0 Is Ready">
+  <meta name="twitter:description" content="Your extension is updated. See the new Overview, Technology, Products and Audit workflow.">
   <meta name="twitter:image" content="https://welookup.info/welookuplogo.png">
   <link rel="canonical" href="https://welookup.info/update/">
-  <title>WeLookup 1.1.0 Release Notes | Shopify Research Update</title>
+  <title>WeLookup 1.1.0 Is Ready | See What Changed</title>
 
   <link rel="icon" href="/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/landing-v2/styles.css?v=20261126d">
-  <link rel="stylesheet" href="/update/styles.css?v=20261126a">
+  <link rel="stylesheet" href="/update/styles.css?v=20261126c">
   <script src="/landing-v2/script.js?v=20261126c" defer></script>
 
   <script type="application/ld+json">
@@ -75,7 +75,7 @@
           {
             "@type": "ListItem",
             "position": 2,
-            "name": "Version 1.1.0 release notes",
+            "name": "Version 1.1.0 update",
             "item": "https://welookup.info/update/"
           }
         ]
@@ -86,10 +86,18 @@
         "mainEntity": [
           {
             "@type": "Question",
+            "name": "Is WeLookup 1.1.0 already active?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. If Chrome opened this page after an extension update, WeLookup 1.1.0 is already installed and active. No further action is required."
+            }
+          },
+          {
+            "@type": "Question",
             "name": "What is new in WeLookup 1.1.0?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "WeLookup 1.1.0 introduces a redesigned Chrome side panel with Overview, Technology, Products and Audit views, stronger Shopify research tools, public catalog scanning and AI-readiness checks."
+              "text": "WeLookup 1.1.0 introduces four focused views: Overview, Technology, Products and Audit. It also adds clearer loading states, stronger Shopify research tools, catalog scanning and AI-readiness checks."
             }
           },
           {
@@ -114,14 +122,6 @@
             "acceptedAnswer": {
               "@type": "Answer",
               "text": "No scan results are uploaded to or stored on WeLookup servers. Analysis runs locally in Chrome and results stay on the user's device."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Is WeLookup free?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes. WeLookup is a free Chrome extension."
             }
           },
           {
@@ -153,224 +153,121 @@
         <span class="sr-only">Open navigation</span>
       </button>
       <nav class="site-nav" id="site-navigation" aria-label="Primary navigation" data-navigation>
-        <a href="#whats-new">What is new</a>
-        <a href="#coverage">Coverage</a>
-        <a href="#privacy">Privacy</a>
+        <a href="#new-views">New views</a>
+        <a href="#interface">Highlights</a>
         <a href="#faq">FAQ</a>
         <a href="/">Homepage</a>
       </nav>
-      <a class="button button-small header-cta" href="https://chromewebstore.google.com/detail/welookup/beocpennmliolhmgdiiacnkdpdpbcpmk?hl=en-US&utm_source=update-page" target="_blank" rel="noopener noreferrer">Add to Chrome</a>
+      <div class="header-update-status"><span class="material-symbols-rounded" aria-hidden="true">check_circle</span> 1.1.0 active</div>
     </div>
   </header>
 
   <main id="main-content">
-    <section class="update-hero">
-      <div class="shell update-hero-grid">
-        <div class="update-hero-copy">
-          <div class="release-badge"><span class="release-dot" aria-hidden="true"></span> Version 1.1.0 · Released November 25, 2026</div>
-          <h1>Storefront research, rebuilt around the questions that matter.</h1>
-          <p>WeLookup 1.1.0 brings a clearer Chrome side panel for detecting ecommerce technology, understanding Shopify stores, exploring public catalogs and checking AI readiness without leaving the page.</p>
-          <div class="update-actions">
-            <a class="button" href="https://chromewebstore.google.com/detail/welookup/beocpennmliolhmgdiiacnkdpdpbcpmk?hl=en-US&utm_source=update-page-hero" target="_blank" rel="noopener noreferrer">
-              <img class="button-icon" src="/landing-v2/assets/google-chrome.svg" alt="" width="22" height="22">
-              Install free
-            </a>
-            <a class="text-link" href="#whats-new">Explore the update</a>
+    <section class="update-confirmation">
+      <div class="shell update-confirmation-inner">
+        <div class="update-check" aria-hidden="true"><span class="material-symbols-rounded">check</span></div>
+        <p class="update-kicker">Update complete · Version 1.1.0</p>
+        <h1>WeLookup has been updated for you.</h1>
+        <p class="update-lead">The new version is already active in Chrome. You now have four focused views for storefront technology, Shopify catalog research and AI-readiness checks.</p>
+        <p class="no-action-note"><span class="material-symbols-rounded" aria-hidden="true">verified</span><strong>No action needed.</strong> Open any storefront and click WeLookup to use the updated side panel.</p>
+
+        <ul class="update-benefit-list" aria-label="WeLookup 1.1.0 key benefits">
+          <li><span class="material-symbols-rounded" aria-hidden="true">apps</span><div><strong>8,244 technology signatures</strong><small>Including 873 Shopify apps</small></div></li>
+          <li><span class="material-symbols-rounded" aria-hidden="true">view_sidebar</span><div><strong>Four focused views</strong><small>Overview, Technology, Products and Audit</small></div></li>
+          <li><span class="material-symbols-rounded" aria-hidden="true">speed</span><div><strong>Built to stay lightweight</strong><small>Fast access from the Chrome side panel</small></div></li>
+          <li><span class="material-symbols-rounded" aria-hidden="true">sell</span><div><strong>Free to use</strong><small>No paid plan required</small></div></li>
+          <li><span class="material-symbols-rounded" aria-hidden="true">devices</span><div><strong>Local analysis</strong><small>Scan results stay on your device</small></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="answers section-space update-views" id="new-views">
+      <div class="shell">
+        <div class="section-heading product-heading">
+          <p class="kicker">What you have now</p>
+          <h2>Your updated side panel has four focused views.</h2>
+          <p>Each view answers a specific storefront research question and keeps the result beside the page.</p>
+        </div>
+        <div class="answer-tabs" role="tablist" aria-label="WeLookup 1.1.0 views">
+          <button type="button" role="tab" aria-selected="true" aria-controls="answer-panel" id="answer-tab-overview" data-answer-tab="overview">Overview</button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="answer-panel" id="answer-tab-technology" data-answer-tab="technology" tabindex="-1">Technology</button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="answer-panel" id="answer-tab-products" data-answer-tab="products" tabindex="-1">Products</button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="answer-panel" id="answer-tab-audit" data-answer-tab="audit" tabindex="-1">Audit</button>
+        </div>
+        <div class="answer-stage" id="answer-panel" role="tabpanel" aria-labelledby="answer-tab-overview" tabindex="0">
+          <div class="answer-copy">
+            <p class="kicker" data-answer-kicker>Overview</p>
+            <h3 data-answer-title>Get the big picture, fast.</h3>
+            <p data-answer-copy>Confirm the store platform, review public store details, and see detected apps, theme evidence, and audit issues in one place.</p>
+            <ul class="answer-points" data-answer-points>
+              <li>Store and platform summary</li>
+              <li>Apps and technologies count</li>
+              <li>Shopify theme and audit signals when available</li>
+            </ul>
           </div>
-          <ul class="release-assurances" aria-label="Release assurances">
-            <li><span class="material-symbols-rounded" aria-hidden="true">sell</span> Free to use</li>
-            <li><span class="material-symbols-rounded" aria-hidden="true">speed</span> Built to stay lightweight</li>
-            <li><span class="material-symbols-rounded" aria-hidden="true">devices</span> Analysis stays local</li>
+          <div class="product-shot answer-shot">
+            <div class="product-shot-bar"><span></span><span></span><span></span><b data-answer-window>OVERVIEW</b></div>
+            <img src="/landing-v2/assets/product/overview.png" alt="WeLookup Overview interface" width="840" height="1440" data-answer-image>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="interface-update update-section" id="interface">
+      <div class="shell interface-grid">
+        <div class="interface-shot">
+          <div class="screen-bar"><span></span><span></span><span></span><b>WELOOKUP · PRODUCTS</b></div>
+          <img src="/landing-v2/assets/product/products.png" alt="WeLookup Products view with catalog search and export controls" width="840" height="1440">
+        </div>
+        <div class="interface-copy">
+          <p class="kicker">A calmer, clearer interface</p>
+          <h2>Progress and controls are easier to see.</h2>
+          <ul class="interface-list">
+            <li><span class="material-symbols-rounded" aria-hidden="true">progress_activity</span><div><strong>Visible loading states</strong><p>Active scans now provide clearer visual feedback.</p></div></li>
+            <li><span class="material-symbols-rounded" aria-hidden="true">search</span><div><strong>Prominent search and export tools</strong><p>Product controls are separated and easier to find.</p></div></li>
+            <li><span class="material-symbols-rounded" aria-hidden="true">bottom_navigation</span><div><strong>Consistent navigation</strong><p>Move between all four views from the fixed bottom menu.</p></div></li>
           </ul>
         </div>
-
-        <div class="release-visual" aria-label="WeLookup 1.1.0 Overview, Technology and Audit interfaces">
-          <div class="release-screen release-screen-main">
-            <div class="screen-bar"><span></span><span></span><span></span><b>WELOOKUP · OVERVIEW</b></div>
-            <img src="/landing-v2/assets/product/overview.png" alt="WeLookup Overview showing Shopify confirmation and storefront research shortcuts" width="840" height="1440">
-          </div>
-          <div class="release-screen release-screen-technology" aria-hidden="true">
-            <img src="/landing-v2/assets/product/technology.png" alt="" width="840" height="1440">
-          </div>
-          <div class="release-screen release-screen-audit" aria-hidden="true">
-            <img src="/landing-v2/assets/product/audit.png" alt="" width="840" height="1440">
-          </div>
-          <div class="release-orbit release-orbit-one"><span class="material-symbols-rounded" aria-hidden="true">apps</span><b>8,244</b><small>technology signatures</small></div>
-          <div class="release-orbit release-orbit-two"><span class="material-symbols-rounded" aria-hidden="true">verified</span><b>873</b><small>Shopify apps</small></div>
-        </div>
       </div>
     </section>
 
-    <section class="release-metrics" aria-label="WeLookup 1.1.0 highlights">
-      <div class="shell metric-grid">
-        <div><strong>4</strong><span>focused research views</span></div>
-        <div><strong>8,244</strong><span>technology signatures</span></div>
-        <div><strong>873</strong><span>Shopify apps</span></div>
-        <div><strong>Local</strong><span>browser analysis</span></div>
-      </div>
-    </section>
-
-    <section class="update-section" id="whats-new">
+    <section class="scope-summary update-section">
       <div class="shell">
-        <div class="update-heading">
-          <p class="kicker">What is new in 1.1.0</p>
-          <h2>Four focused views. One faster research workflow.</h2>
-          <p>The new structure keeps each result close to the question that produced it, while preserving the same public-page analysis at the core of WeLookup.</p>
+        <div class="scope-summary-heading">
+          <p class="kicker">What works where</p>
+          <h2>Technology everywhere. Deeper research when Shopify is confirmed.</h2>
         </div>
-
-        <div class="view-card-grid">
-          <article class="view-card view-card-overview">
-            <span class="view-icon material-symbols-rounded" aria-hidden="true">home</span>
-            <p class="view-label">Overview</p>
-            <h3>Understand the store at a glance.</h3>
-            <p>Confirm the platform, review public store details and move directly to detected technologies, Shopify theme evidence and audit findings.</p>
-            <ul>
-              <li>Store identity and public details</li>
-              <li>Platform confirmation and research shortcuts</li>
-              <li>Detected apps and technologies summary</li>
-            </ul>
-          </article>
-
-          <article class="view-card view-card-technology">
-            <span class="view-icon material-symbols-rounded" aria-hidden="true">layers</span>
-            <p class="view-label">Technology</p>
-            <h3>Reveal the technology behind the page.</h3>
-            <p>Match public storefront signals against a broad detection library covering ecommerce platforms, analytics, marketing, reviews, support and payments.</p>
-            <ul>
-              <li>Searchable, grouped detections</li>
-              <li>Confidence for each result</li>
-              <li>Shopify app coverage when identifiable</li>
-            </ul>
-          </article>
-
-          <article class="view-card view-card-products">
-            <span class="view-icon material-symbols-rounded" aria-hidden="true">sell</span>
-            <p class="view-label">Products</p>
-            <h3>Research the public Shopify catalog.</h3>
-            <p>Run Quick or Full scans on confirmed Shopify storefronts, search the collected catalog, review pricing and export product findings.</p>
-            <ul>
-              <li>Quick and Full scan modes</li>
-              <li>Product and collection search</li>
-              <li>Pricing summaries and CSV export</li>
-            </ul>
-          </article>
-
-          <article class="view-card view-card-audit">
-            <span class="view-icon material-symbols-rounded" aria-hidden="true">warning</span>
-            <p class="view-label">Audit</p>
-            <h3>Check AI and search readiness.</h3>
-            <p>Review diagnostic checks related to how AI agents and search assistants can understand and use a confirmed Shopify storefront.</p>
-            <ul>
-              <li>Readiness score out of 100</li>
-              <li>Passed, warning and failed checks</li>
-              <li>Plain-language findings to review</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="product-tour update-section">
-      <div class="shell tour-grid">
-        <div class="tour-shot">
-          <div class="screen-bar"><span></span><span></span><span></span><b>WELOOKUP · PRODUCTS</b></div>
-          <img src="/landing-v2/assets/product/products.png" alt="WeLookup Products view with Shopify catalog scanning, search and export controls" width="840" height="1440">
-        </div>
-        <div class="tour-copy">
-          <p class="kicker">A calmer, clearer interface</p>
-          <h2>Designed to show progress, not leave you guessing.</h2>
-          <p>Refined loading states, stronger visual hierarchy and focused controls make long scans easier to follow. Results remain organized inside the side panel, beside the storefront that produced them.</p>
-          <div class="tour-points">
-            <article><span class="material-symbols-rounded" aria-hidden="true">progress_activity</span><div><h3>Visible scan progress</h3><p>Loading states make active analysis easier to recognize.</p></div></article>
-            <article><span class="material-symbols-rounded" aria-hidden="true">tune</span><div><h3>Focused controls</h3><p>Search, filters and exports are easier to find and use.</p></div></article>
-            <article><span class="material-symbols-rounded" aria-hidden="true">view_sidebar</span><div><h3>One side panel</h3><p>Move between views without leaving the active storefront.</p></div></article>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="scope-update update-section" id="coverage">
-      <div class="shell">
-        <div class="update-heading scope-heading">
-          <p class="kicker">Clear product scope</p>
-          <h2>Useful on any storefront. Deeper when Shopify is confirmed.</h2>
-          <p>WeLookup separates general technology detection from Shopify-specific research, so it only presents results supported by the public evidence available on the current site.</p>
-        </div>
-
-        <div class="scope-columns">
-          <article class="scope-card">
-            <div class="scope-card-head">
-              <span class="material-symbols-rounded" aria-hidden="true">public</span>
-              <div><p>Any public storefront</p><h3>Technology and store signals</h3></div>
-            </div>
-            <ul>
-              <li>Platforms, apps and website technologies</li>
-              <li>Public metadata and visible store details</li>
-              <li>Searchable detection results with confidence</li>
-            </ul>
-          </article>
-          <article class="scope-card scope-card-shopify">
-            <div class="scope-card-head">
-              <img src="/landing-v2/assets/platforms/shopify.svg" alt="" width="50" height="56">
-              <div><p>Shopify confirmed</p><h3>Theme, catalog and AI-readiness research</h3></div>
-            </div>
-            <ul>
-              <li>Shopify theme family and evidence</li>
-              <li>Public product and collection catalog scans</li>
-              <li>AI and search readiness diagnostic checks</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="update-privacy update-section" id="privacy">
-      <div class="shell update-privacy-inner">
-        <div>
-          <p class="kicker">Private by design</p>
-          <h2>The analysis runs beside the page, not on our servers.</h2>
-          <p>WeLookup analyzes public storefront signals locally in Chrome. Scan results stay on your device and are not uploaded to or stored by WeLookup.</p>
-          <a class="privacy-link" href="/privacy-policy.html">Read the privacy policy</a>
-        </div>
-        <div class="privacy-proof-grid">
-          <article><span class="material-symbols-rounded" aria-hidden="true">lock</span><h3>No admin access</h3><p>No Shopify admin, store password or merchant credentials.</p></article>
-          <article><span class="material-symbols-rounded" aria-hidden="true">devices</span><h3>Local analysis</h3><p>Research stays in your browser and on your device.</p></article>
-          <article><span class="material-symbols-rounded" aria-hidden="true">public</span><h3>Public evidence</h3><p>Results depend on signals exposed by the storefront.</p></article>
-          <article><span class="material-symbols-rounded" aria-hidden="true">sell</span><h3>Free to use</h3><p>Install the Chrome extension and start researching.</p></article>
+        <div class="scope-summary-grid">
+          <article><span class="material-symbols-rounded" aria-hidden="true">public</span><h3>Any public storefront</h3><p>Detect platforms, apps and website technologies from public page signals.</p></article>
+          <article><img src="/landing-v2/assets/platforms/shopify.svg" alt="" width="42" height="46"><h3>Shopify confirmed</h3><p>Unlock theme evidence, public catalog scans and AI-readiness checks.</p></article>
+          <article><span class="material-symbols-rounded" aria-hidden="true">lock</span><h3>Local by design</h3><p>Analysis runs in Chrome. Results are not uploaded to or stored by WeLookup.</p></article>
         </div>
       </div>
     </section>
 
     <section class="update-faq update-section" id="faq">
       <div class="shell faq-inner">
-        <div class="update-heading">
-          <p class="kicker">Release FAQ</p>
-          <h2>What to know before you update.</h2>
+        <div class="section-heading">
+          <p class="kicker">Update FAQ</p>
+          <h2>What to know about version 1.1.0.</h2>
         </div>
         <div class="faq-list">
-          <details><summary>What is new in WeLookup 1.1.0?<span class="material-symbols-rounded" aria-hidden="true">add</span></summary><p>WeLookup 1.1.0 introduces a redesigned Chrome side panel with Overview, Technology, Products and Audit views, stronger Shopify research tools, public catalog scanning and AI-readiness checks.</p></details>
+          <details><summary>Is WeLookup 1.1.0 already active?<span class="material-symbols-rounded" aria-hidden="true">add</span></summary><p>Yes. If Chrome opened this page after an extension update, WeLookup 1.1.0 is already installed and active. No further action is required.</p></details>
+          <details><summary>What is new in WeLookup 1.1.0?<span class="material-symbols-rounded" aria-hidden="true">add</span></summary><p>WeLookup 1.1.0 introduces four focused views: Overview, Technology, Products and Audit. It also adds clearer loading states, stronger Shopify research tools, catalog scanning and AI-readiness checks.</p></details>
           <details><summary>Does WeLookup work on stores that are not built with Shopify?<span class="material-symbols-rounded" aria-hidden="true">add</span></summary><p>Yes. Technology detection works across public storefronts. Shopify-specific theme, product catalog and AI-readiness features appear only when Shopify is confirmed and the required public signals are available.</p></details>
           <details><summary>How many apps and technologies can WeLookup detect?<span class="material-symbols-rounded" aria-hidden="true">add</span></summary><p>The current detection library contains 8,244 technology signatures, including 873 Shopify apps.</p></details>
           <details><summary>Does WeLookup upload or store scan results?<span class="material-symbols-rounded" aria-hidden="true">add</span></summary><p>No scan results are uploaded to or stored on WeLookup servers. Analysis runs locally in Chrome and results stay on your device.</p></details>
-          <details><summary>Is WeLookup free?<span class="material-symbols-rounded" aria-hidden="true">add</span></summary><p>Yes. WeLookup is a free Chrome extension.</p></details>
           <details><summary>How large is the WeLookup Chrome extension?<span class="material-symbols-rounded" aria-hidden="true">add</span></summary><p>The current Chrome Web Store package is 1.35 MiB. WeLookup is built to remain lightweight while keeping its core research tools close to the page.</p></details>
         </div>
       </div>
     </section>
 
-    <section class="update-final update-section">
-      <div class="shell update-final-inner">
-        <img src="/welookuplogo.png" alt="" width="68" height="68">
-        <p class="kicker">WeLookup 1.1.0</p>
-        <h2>Open a storefront. See what is behind it.</h2>
-        <p>Install the free Chrome extension and keep focused storefront research beside the page.</p>
-        <div class="update-final-actions">
-          <a class="button" href="https://chromewebstore.google.com/detail/welookup/beocpennmliolhmgdiiacnkdpdpbcpmk?hl=en-US&utm_source=update-page-footer" target="_blank" rel="noopener noreferrer">
-            <img class="button-icon" src="/landing-v2/assets/google-chrome.svg" alt="" width="22" height="22">
-            Add to Chrome
-          </a>
-          <a class="text-link" href="/">Visit the homepage</a>
-        </div>
+    <section class="update-ready update-section">
+      <div class="shell update-ready-inner">
+        <div class="update-check update-check-small" aria-hidden="true"><span class="material-symbols-rounded">check</span></div>
+        <p class="kicker">You are ready</p>
+        <h2>Open a storefront and use WeLookup 1.1.0.</h2>
+        <p>The updated side panel is already available. Open any storefront, click the WeLookup icon and start with Overview.</p>
       </div>
     </section>
   </main>
@@ -380,7 +277,7 @@
       <a class="brand" href="/" aria-label="WeLookup homepage"><img src="/welookuplogo.png" alt="" width="30" height="30"><span>WeLookup</span></a>
       <nav aria-label="Footer navigation">
         <a href="/">Homepage</a>
-        <a href="#whats-new">What is new</a>
+        <a href="#new-views">New views</a>
         <a href="/privacy-policy.html">Privacy policy</a>
         <a href="mailto:support@welookup.info">Support</a>
       </nav>
