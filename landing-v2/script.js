@@ -48,10 +48,84 @@ const answerShot = answerImage?.closest(".answer-shot");
 const scrollCta = document.querySelector("[data-scroll-cta]");
 const scrollCtaClose = document.querySelector("[data-scroll-cta-close]");
 const hero = document.querySelector(".hero");
+const heroCarousel = document.querySelector("[data-hero-carousel]");
+const heroPanels = Array.from(document.querySelectorAll("[data-hero-panel]"));
+const heroCarouselControls = Array.from(document.querySelectorAll("[data-hero-carousel-control]"));
 const heroAppOrbs = Array.from(document.querySelectorAll(".hero-app-orb"));
 const scrollCtaDismissedKey = "welookup-landing-v2-scroll-cta-dismissed";
 let scrollCtaDismissed = sessionStorage.getItem(scrollCtaDismissedKey) === "true";
 let scrollCtaShown = false;
+
+function enableHeroCarousel() {
+  if (!heroCarousel || heroPanels.length < 2) return;
+
+  const slots = ["front", "next", "back", "previous"];
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let activeIndex = 0;
+  let rotationTimer = 0;
+  let pointerPaused = false;
+  let focusPaused = false;
+
+  function renderCarousel(nextIndex) {
+    activeIndex = (nextIndex + heroPanels.length) % heroPanels.length;
+
+    heroPanels.forEach((panel, panelIndex) => {
+      const relativeIndex = (panelIndex - activeIndex + heroPanels.length) % heroPanels.length;
+      panel.dataset.stackSlot = slots[relativeIndex] || "back";
+      panel.setAttribute("aria-hidden", String(relativeIndex !== 0));
+    });
+
+    heroCarouselControls.forEach((control, controlIndex) => {
+      control.setAttribute("aria-pressed", String(controlIndex === activeIndex));
+    });
+  }
+
+  function stopRotation() {
+    window.clearInterval(rotationTimer);
+    rotationTimer = 0;
+  }
+
+  function startRotation() {
+    stopRotation();
+    if (reducedMotion.matches || pointerPaused || focusPaused || document.hidden) return;
+    rotationTimer = window.setInterval(() => renderCarousel(activeIndex + 1), 4500);
+  }
+
+  heroCarouselControls.forEach((control, controlIndex) => {
+    control.addEventListener("click", () => {
+      renderCarousel(controlIndex);
+      startRotation();
+    });
+  });
+
+  heroCarousel.addEventListener("pointerenter", () => {
+    pointerPaused = true;
+    stopRotation();
+  });
+
+  heroCarousel.addEventListener("pointerleave", () => {
+    pointerPaused = false;
+    startRotation();
+  });
+
+  heroCarousel.addEventListener("focusin", () => {
+    focusPaused = true;
+    stopRotation();
+  });
+
+  heroCarousel.addEventListener("focusout", () => {
+    window.requestAnimationFrame(() => {
+      focusPaused = heroCarousel.contains(document.activeElement);
+      startRotation();
+    });
+  });
+
+  document.addEventListener("visibilitychange", startRotation);
+  reducedMotion.addEventListener?.("change", startRotation);
+
+  renderCarousel(0);
+  startRotation();
+}
 
 function enableHeroAppParallax() {
   if (!hero || !heroAppOrbs.length) return;
@@ -223,3 +297,4 @@ window.addEventListener("resize", () => {
 updateHeader();
 updateScrollCta();
 enableHeroAppParallax();
+enableHeroCarousel();

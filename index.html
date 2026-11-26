@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/landing-v2/styles.css?v=20261126e">
-  <script src="/landing-v2/script.js?v=20261126c" defer></script>
+  <script src="/landing-v2/script.js?v=20261126d" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -149,13 +149,29 @@
           </ul>
         </div>
 
-        <div class="hero-product reveal" aria-label="WeLookup showing Overview, Technology, Products and Audit results">
-          <div class="hero-panel hero-panel-main">
+        <div class="hero-product reveal" aria-label="WeLookup showing Overview, Technology, Products and Audit results" data-hero-carousel>
+          <div class="hero-panel hero-panel-main" data-hero-panel data-stack-slot="front" aria-hidden="false">
             <div class="panel-bar"><span></span><span></span><span></span><b>WELOOKUP · OVERVIEW</b></div>
             <img src="/landing-v2/assets/product/overview.png" alt="WeLookup Overview showing a confirmed Shopify storefront and detected apps" width="840" height="1440">
           </div>
-          <div class="hero-panel hero-panel-technology" aria-hidden="true"><img src="/landing-v2/assets/product/technology.png" alt="" width="840" height="1440"></div>
-          <div class="hero-panel hero-panel-audit" aria-hidden="true"><img src="/landing-v2/assets/product/audit.png" alt="" width="840" height="1440"></div>
+          <div class="hero-panel hero-panel-technology" data-hero-panel data-stack-slot="next" aria-hidden="true">
+            <div class="panel-bar"><span></span><span></span><span></span><b>WELOOKUP · TECHNOLOGY</b></div>
+            <img src="/landing-v2/assets/product/technology.png" alt="WeLookup Technology view showing detected storefront tools" width="840" height="1440">
+          </div>
+          <div class="hero-panel hero-panel-products" data-hero-panel data-stack-slot="back" aria-hidden="true">
+            <div class="panel-bar"><span></span><span></span><span></span><b>WELOOKUP · PRODUCTS</b></div>
+            <img src="/landing-v2/assets/product/products.png" alt="WeLookup Products view showing public catalog research" width="840" height="1440">
+          </div>
+          <div class="hero-panel hero-panel-audit" data-hero-panel data-stack-slot="previous" aria-hidden="true">
+            <div class="panel-bar"><span></span><span></span><span></span><b>WELOOKUP · AUDIT</b></div>
+            <img src="/landing-v2/assets/product/audit.png" alt="WeLookup Audit view showing AI and search readiness" width="840" height="1440">
+          </div>
+          <div class="hero-carousel-controls" role="group" aria-label="Choose a WeLookup view">
+            <button type="button" data-hero-carousel-control="0" aria-label="Show Overview" aria-pressed="true"></button>
+            <button type="button" data-hero-carousel-control="1" aria-label="Show Technology" aria-pressed="false"></button>
+            <button type="button" data-hero-carousel-control="2" aria-label="Show Products" aria-pressed="false"></button>
+            <button type="button" data-hero-carousel-control="3" aria-label="Show Audit" aria-pressed="false"></button>
+          </div>
           <div class="hero-app-cloud" aria-hidden="true">
             <span class="hero-app-orb hero-app-orb-1" data-motion-x="1" data-motion-y="0.45" data-cross="0.18" data-turn="-0.9" data-lag="0.075"><img src="/landing-v2/assets/apps/app-01.png" alt="" width="192" height="192"></span>
             <span class="hero-app-orb hero-app-orb-2" data-motion-x="-0.55" data-motion-y="0.85" data-cross="-0.25" data-turn="0.6" data-lag="0.05"><img src="/landing-v2/assets/apps/app-02.png" alt="" width="192" height="192"></span>
